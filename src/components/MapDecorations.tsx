@@ -323,40 +323,213 @@ const drawEnhancedTree = (ctx: CanvasRenderingContext2D, x: number, y: number, s
 };
 
 const drawEnhancedRock = (ctx: CanvasRenderingContext2D, x: number, y: number, scale: number = 1.0) => {
-  const size = 8 * scale;
+  // Realm Defense style chunky rock cluster with warm colors and soft highlights
+  const baseSize = 12 * scale;
+  const shadowOffset = 2 * scale;
   
-  // Main rock with gradient effect
-  const gradient = ctx.createRadialGradient(x - 2, y - 2, 0, x, y, size);
-  gradient.addColorStop(0, '#A9A9A9');
-  gradient.addColorStop(1, '#696969');
+  // === SHADOWS (drawn first, behind everything) ===
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
   
-  ctx.fillStyle = gradient;
-  ctx.strokeStyle = '#2F4F4F';
+  // Main rock shadow
+  ctx.beginPath();
+  ctx.ellipse(x + shadowOffset, y + shadowOffset, baseSize, baseSize * 0.8, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Side rocks shadows
+  ctx.beginPath();
+  ctx.ellipse(x + 8 * scale + shadowOffset, y + 4 * scale + shadowOffset, baseSize * 0.7, baseSize * 0.6, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  ctx.beginPath();
+  ctx.ellipse(x - 6 * scale + shadowOffset, y + 3 * scale + shadowOffset, baseSize * 0.5, baseSize * 0.4, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Small accent rocks shadows
+  ctx.beginPath();
+  ctx.ellipse(x - 3 * scale + shadowOffset, y - 4 * scale + shadowOffset, baseSize * 0.3, baseSize * 0.25, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  ctx.beginPath();
+  ctx.ellipse(x + 10 * scale + shadowOffset, y - 2 * scale + shadowOffset, baseSize * 0.35, baseSize * 0.3, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // === MAIN ROCK CLUSTER (warm base colors) ===
+  
+  // 1. Main center rock (largest, warm gray base)
+  ctx.fillStyle = '#8D7B68'; // Warm brownish-gray base
+  ctx.beginPath();
+  ctx.ellipse(x, y, baseSize, baseSize * 0.8, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // 2. Right side rock
+  ctx.fillStyle = '#9C8B7A'; // Slightly lighter warm gray
+  ctx.beginPath();
+  ctx.ellipse(x + 8 * scale, y + 4 * scale, baseSize * 0.7, baseSize * 0.6, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // 3. Left side rock
+  ctx.fillStyle = '#7A6B5D'; // Darker warm gray for variety
+  ctx.beginPath();
+  ctx.ellipse(x - 6 * scale, y + 3 * scale, baseSize * 0.5, baseSize * 0.4, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // 4. Small accent rocks for organic clustering
+  ctx.fillStyle = '#A69B8E'; // Light warm gray
+  ctx.beginPath();
+  ctx.ellipse(x - 3 * scale, y - 4 * scale, baseSize * 0.3, baseSize * 0.25, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  ctx.beginPath();
+  ctx.ellipse(x + 10 * scale, y - 2 * scale, baseSize * 0.35, baseSize * 0.3, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // === SHADOW LAYERS (darker areas where light doesn't reach) ===
+  
+  // Main rock shadow areas
+  ctx.fillStyle = '#6B5D52'; // Dark shadow color
+  ctx.beginPath();
+  ctx.ellipse(x + 2 * scale, y + 2 * scale, baseSize * 0.6, baseSize * 0.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Side rocks shadow areas
+  ctx.fillStyle = '#6B5D52';
+  ctx.beginPath();
+  ctx.ellipse(x + 9 * scale, y + 5 * scale, baseSize * 0.4, baseSize * 0.35, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  ctx.beginPath();
+  ctx.ellipse(x - 5 * scale, y + 4 * scale, baseSize * 0.3, baseSize * 0.25, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // === HIGHLIGHT LAYERS (where light hits the rocks) ===
+  
+  // Main rock highlights (top-left where light comes from)
+  ctx.fillStyle = '#B8ADA0'; // Warm light highlight
+  ctx.beginPath();
+  ctx.ellipse(x - 3 * scale, y - 2 * scale, baseSize * 0.5, baseSize * 0.4, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Side rocks highlights
+  ctx.fillStyle = '#B8ADA0';
+  ctx.beginPath();
+  ctx.ellipse(x + 6 * scale, y + 2 * scale, baseSize * 0.35, baseSize * 0.3, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  ctx.beginPath();
+  ctx.ellipse(x - 7 * scale, y + 1 * scale, baseSize * 0.25, baseSize * 0.2, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Small accent highlights
+  ctx.fillStyle = '#C4B9AC'; // Brighter highlight
+  ctx.beginPath();
+  ctx.ellipse(x - 4 * scale, y - 5 * scale, baseSize * 0.15, baseSize * 0.12, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  ctx.beginPath();
+  ctx.ellipse(x + 8 * scale, y - 3 * scale, baseSize * 0.18, baseSize * 0.15, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // === BRIGHTEST HIGHLIGHTS (very small, very bright spots) ===
+  
+  ctx.fillStyle = '#D4C9BC'; // Very bright warm highlight
+  
+  // Tiny bright spots where light hits most directly
+  ctx.beginPath();
+  ctx.ellipse(x - 4 * scale, y - 3 * scale, baseSize * 0.12, baseSize * 0.1, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  ctx.beginPath();
+  ctx.ellipse(x + 7 * scale, y + 1 * scale, baseSize * 0.1, baseSize * 0.08, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  ctx.beginPath();
+  ctx.ellipse(x - 6 * scale, y + 0.5 * scale, baseSize * 0.08, baseSize * 0.06, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // === TEXTURE AND DETAILS ===
+  
+  // Add subtle crack lines for rock texture
+  ctx.strokeStyle = '#5A4D42'; // Dark brown for cracks
   ctx.lineWidth = 1;
-  
-  ctx.beginPath();
-  ctx.ellipse(x, y, size, size * 0.75, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.stroke();
-  
-  // Smaller rocks around
-  ctx.fillStyle = '#808080';
-  ctx.beginPath();
-  ctx.ellipse(x + 6 * scale, y + 3 * scale, size * 0.6, size * 0.5, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.stroke();
-  
-  ctx.beginPath();
-  ctx.ellipse(x - 4 * scale, y + 2 * scale, size * 0.4, size * 0.3, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.stroke();
-  
-  // Add moss
-  ctx.fillStyle = '#228B22';
   ctx.globalAlpha = 0.6;
+  
+  // Main rock cracks
   ctx.beginPath();
-  ctx.ellipse(x - 2, y - 1, 3, 2, 0, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.moveTo(x - 4 * scale, y - 6 * scale);
+  ctx.lineTo(x + 2 * scale, y + 4 * scale);
+  ctx.stroke();
+  
+  ctx.beginPath();
+  ctx.moveTo(x + 3 * scale, y - 3 * scale);
+  ctx.lineTo(x - 2 * scale, y + 6 * scale);
+  ctx.stroke();
+  
+  // Side rock cracks
+  ctx.beginPath();
+  ctx.moveTo(x + 6 * scale, y + 1 * scale);
+  ctx.lineTo(x + 10 * scale, y + 6 * scale);
+  ctx.stroke();
+  
+  ctx.globalAlpha = 1.0;
+  
+  // === MOSS AND VEGETATION (optional, based on position) ===
+  
+  // Use seeded random for consistent moss placement
+  const seed = x + y * 1000;
+  let random = seed;
+  const seededRandom = () => {
+    random = (random * 9301 + 49297) % 233280;
+    return random / 233280;
+  };
+  
+  if (seededRandom() > 0.4) { // 60% chance of moss
+    // Moss patches in shadowed areas
+    ctx.fillStyle = '#4A5D23'; // Dark moss green
+    ctx.globalAlpha = 0.8;
+    
+    ctx.beginPath();
+    ctx.ellipse(x + 1 * scale, y + 3 * scale, 3 * scale, 2 * scale, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Lighter moss highlight
+    ctx.fillStyle = '#6B8E23';
+    ctx.globalAlpha = 0.6;
+    ctx.beginPath();
+    ctx.ellipse(x + 0.5 * scale, y + 2.5 * scale, 2 * scale, 1.5 * scale, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Small moss spots on other rocks
+    if (seededRandom() > 0.5) {
+      ctx.fillStyle = '#4A5D23';
+      ctx.globalAlpha = 0.7;
+      ctx.beginPath();
+      ctx.ellipse(x - 5 * scale, y + 2 * scale, 1.5 * scale, 1 * scale, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    
+    ctx.globalAlpha = 1.0;
+  }
+  
+  // === SUBTLE OUTLINES (very light, for definition) ===
+  
+  ctx.strokeStyle = '#5A4D42'; // Subtle dark outline
+  ctx.lineWidth = 0.5;
+  ctx.globalAlpha = 0.3;
+  
+  // Main rock outline
+  ctx.beginPath();
+  ctx.ellipse(x, y, baseSize, baseSize * 0.8, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  
+  // Side rocks outlines
+  ctx.beginPath();
+  ctx.ellipse(x + 8 * scale, y + 4 * scale, baseSize * 0.7, baseSize * 0.6, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  
+  ctx.beginPath();
+  ctx.ellipse(x - 6 * scale, y + 3 * scale, baseSize * 0.5, baseSize * 0.4, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  
   ctx.globalAlpha = 1.0;
 };
 
