@@ -20,6 +20,9 @@ export const EnhancedEffects: React.FC<EnhancedEffectsProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // Safety check for gameState
+    if (!gameState || typeof gameState !== 'object') return;
+
     // Clear canvas
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
@@ -27,10 +30,15 @@ export const EnhancedEffects: React.FC<EnhancedEffectsProps> = ({
     drawAmbientEffects(ctx, canvasWidth, canvasHeight);
     
     // Draw tower auras for upgraded towers
-    drawTowerAuras(ctx, gameState.towers);
+    if (Array.isArray(gameState.towers)) {
+      drawTowerAuras(ctx, gameState.towers);
+    }
     
     // Draw wave completion celebration
-    if (gameState.wave > 1 && !gameState.isPlaying && gameState.lives > 0) {
+    if (typeof gameState.wave === 'number' && 
+        typeof gameState.isPlaying === 'boolean' && 
+        typeof gameState.lives === 'number' &&
+        gameState.wave > 1 && !gameState.isPlaying && gameState.lives > 0) {
       drawWaveCompletionEffect(ctx, canvasWidth, canvasHeight);
     }
 
@@ -56,22 +64,39 @@ export const EnhancedEffects: React.FC<EnhancedEffectsProps> = ({
     const time = Date.now() * 0.002;
     
     towers.forEach(tower => {
+      // Safety checks for tower object
+      if (!tower || typeof tower !== 'object') return;
+      if (typeof tower.level !== 'number') return;
+      if (!tower.position || typeof tower.position.x !== 'number' || typeof tower.position.y !== 'number') return;
+      if (!tower.id || typeof tower.id !== 'string') return;
+      
       if (tower.level > 2) {
-        // Draw pulsing aura for high-level towers
-        const pulseRadius = 30 + Math.sin(time + tower.id.charCodeAt(0)) * 5;
-        const alpha = 0.1 + Math.sin(time * 2 + tower.id.charCodeAt(0)) * 0.05;
-        
-        const gradient = ctx.createRadialGradient(
-          tower.position.x, tower.position.y, 0,
-          tower.position.x, tower.position.y, pulseRadius
-        );
-        gradient.addColorStop(0, `rgba(255, 215, 0, ${alpha})`);
-        gradient.addColorStop(1, 'rgba(255, 215, 0, 0)');
-        
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(tower.position.x, tower.position.y, pulseRadius, 0, Math.PI * 2);
-        ctx.fill();
+        try {
+          // Draw pulsing aura for high-level towers
+          const pulseRadius = 30 + Math.sin(time + tower.id.charCodeAt(0)) * 5;
+          const alpha = 0.1 + Math.sin(time * 2 + tower.id.charCodeAt(0)) * 0.05;
+          
+          // Safety check for valid radius
+          if (pulseRadius <= 0 || isNaN(pulseRadius)) return;
+          
+          const gradient = ctx.createRadialGradient(
+            tower.position.x, tower.position.y, 0,
+            tower.position.x, tower.position.y, pulseRadius
+          );
+          
+          // Safety check for gradient
+          if (!gradient) return;
+          
+          gradient.addColorStop(0, `rgba(255, 215, 0, ${Math.max(0, Math.min(1, alpha))})`);
+          gradient.addColorStop(1, 'rgba(255, 215, 0, 0)');
+          
+          ctx.fillStyle = gradient;
+          ctx.beginPath();
+          ctx.arc(tower.position.x, tower.position.y, pulseRadius, 0, Math.PI * 2);
+          ctx.fill();
+        } catch (error) {
+          console.warn('Error drawing tower aura:', error);
+        }
       }
     });
   };

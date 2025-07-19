@@ -813,7 +813,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     drawProjectiles(ctx);
     
     // Draw particles
-    if (particleSystem && typeof particleSystem.draw === 'function') {
+    if (particleSystem && typeof particleSystem === 'object' && typeof particleSystem.draw === 'function') {
       try {
         particleSystem.draw(ctx);
       } catch (error) {

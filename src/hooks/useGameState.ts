@@ -21,7 +21,7 @@ const INITIAL_STATE: GameState = {
   particles: [],
   isMusicMuted: false,
   isSoundFxMuted: false,
-  specialAttacks: SPECIAL_ATTACKS.map(attack => ({ ...attack })),
+  specialAttacks: Array.isArray(SPECIAL_ATTACKS) ? SPECIAL_ATTACKS.map(attack => ({ ...attack })) : [],
   achievementProgress: {},
   newAchievements: []
 };
@@ -199,9 +199,18 @@ export const useGameState = () => {
         return prev;
       }
 
-      // Safety check for game state arrays
-      if (!prev.enemies || !prev.towers || !prev.projectiles) {
-        return prev;
+      // Safety check for game state arrays - initialize if undefined
+      if (!Array.isArray(prev.enemies)) {
+        prev = { ...prev, enemies: [] };
+      }
+      if (!Array.isArray(prev.towers)) {
+        prev = { ...prev, towers: [] };
+      }
+      if (!Array.isArray(prev.projectiles)) {
+        prev = { ...prev, projectiles: [] };
+      }
+      if (!Array.isArray(prev.specialAttacks)) {
+        prev = { ...prev, specialAttacks: [] };
       }
 
       const newState = { ...prev };
