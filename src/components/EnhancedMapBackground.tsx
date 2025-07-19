@@ -1,77 +1,150 @@
-// Enhanced map background with professional textures and effects
+// Enhanced map background with Realm Defense style fantasy field
 export const drawEnhancedMapBackground = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
-  // Create a more sophisticated grass background
-  const bgGradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, Math.max(width, height));
-  bgGradient.addColorStop(0, '#4F7942');  // Darker forest green center
-  bgGradient.addColorStop(0.4, '#3CB371'); // Medium sea green
-  bgGradient.addColorStop(0.7, '#32CD32'); // Lime green
-  bgGradient.addColorStop(1, '#228B22');   // Forest green edges
+  // Create Realm Defense style base field with warm, vibrant colors
+  const baseGradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, Math.max(width, height));
+  baseGradient.addColorStop(0, '#7CB342');    // Vibrant center green
+  baseGradient.addColorStop(0.3, '#689F38');  // Rich medium green
+  baseGradient.addColorStop(0.6, '#558B2F');  // Deeper green
+  baseGradient.addColorStop(1, '#33691E');    // Dark forest edges
   
-  ctx.fillStyle = bgGradient;
+  ctx.fillStyle = baseGradient;
   ctx.fillRect(0, 0, width, height);
 
-  // Add depth with multiple grass layers
-  drawGrassLayer(ctx, width, height, 0.05, '#1F4F1F', 800); // Dark base layer
-  drawGrassLayer(ctx, width, height, 0.1, '#228B22', 600);  // Medium layer
-  drawGrassLayer(ctx, width, height, 0.15, '#32CD32', 400); // Bright layer
-  drawGrassLayer(ctx, width, height, 0.2, '#90EE90', 200);  // Light highlights
-
-  // Add natural elements
+  // Add organic texture layers (no grid artifacts)
+  drawOrganicGrassTexture(ctx, width, height);
+  drawGrassClumps(ctx, width, height);
+  drawFieldVariations(ctx, width, height);
+  
+  // Add natural field elements
   drawWildflowerPatches(ctx, width, height);
   drawDirtPatches(ctx, width, height);
   drawRockFormations(ctx, width, height);
   drawMossPatches(ctx, width, height);
 };
 
-const drawGrassLayer = (
-  ctx: CanvasRenderingContext2D, 
-  width: number, 
-  height: number, 
-  alpha: number, 
-  color: string, 
-  density: number
-) => {
-  // Use seeded random for consistent, static placement
-  let seed = 12345 + density; // Different seed per layer
+// Organic grass texture without grid artifacts - Realm Defense style
+const drawOrganicGrassTexture = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
+  let seed = 12345;
   const seededRandom = () => {
     seed = (seed * 9301 + 49297) % 233280;
     return seed / 233280;
   };
 
-  ctx.globalAlpha = alpha;
-  ctx.fillStyle = color;
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 1;
+  // Create organic texture with varied grass tones
+  const grassColors = [
+    '#8BC34A',  // Light grass
+    '#7CB342',  // Medium grass  
+    '#689F38',  // Rich grass
+    '#558B2F',  // Deep grass
+    '#4CAF50',  // Vibrant green
+    '#66BB6A'   // Soft green
+  ];
 
-  for (let i = 0; i < density; i++) {
+  // Draw organic texture patches (no regular patterns)
+  for (let i = 0; i < 1200; i++) {
     const x = seededRandom() * width;
     const y = seededRandom() * height;
-    const grassType = seededRandom();
+    const size = 2 + seededRandom() * 4;
+    const colorIndex = Math.floor(seededRandom() * grassColors.length);
+    
+    ctx.fillStyle = grassColors[colorIndex];
+    ctx.globalAlpha = 0.15 + seededRandom() * 0.25;
+    
+    // Organic blob shapes instead of regular patterns
+    ctx.beginPath();
+    const points = 4 + Math.floor(seededRandom() * 4);
+    ctx.moveTo(x, y);
+    
+    for (let j = 0; j < points; j++) {
+      const angle = (j / points) * Math.PI * 2;
+      const radius = size * (0.7 + seededRandom() * 0.6);
+      const px = x + Math.cos(angle) * radius;
+      const py = y + Math.sin(angle) * radius;
+      ctx.lineTo(px, py);
+    }
+    
+    ctx.closePath();
+    ctx.fill();
+  }
+  
+  ctx.globalAlpha = 1.0;
+};
 
-    if (grassType < 0.7) {
-      // Short static grass blades
-      const bladeHeight = 1 + seededRandom() * 2;
-      ctx.fillRect(x, y, 1, bladeHeight);
-    } else if (grassType < 0.95) {
-      // Medium grass strands - static positions
-      const startX = x;
-      const startY = y;
-      const endX = x + (seededRandom() - 0.5) * 2; // Reduced movement
-      const endY = y - 1 - seededRandom() * 3;
+// Grass clumps for natural variation
+const drawGrassClumps = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
+  let seed = 54321;
+  const seededRandom = () => {
+    seed = (seed * 9301 + 49297) % 233280;
+    return seed / 233280;
+  };
+
+  // Create natural grass clumps
+  for (let i = 0; i < 80; i++) {
+    const clumpX = seededRandom() * width;
+    const clumpY = seededRandom() * height;
+    const clumpSize = 15 + seededRandom() * 25;
+    const clumpDensity = 8 + Math.floor(seededRandom() * 12);
+    
+    // Clump base color variation
+    const baseHue = 80 + (seededRandom() - 0.5) * 40; // Green hues with variation
+    const baseSat = 40 + seededRandom() * 30;
+    const baseLit = 35 + seededRandom() * 25;
+    
+    for (let j = 0; j < clumpDensity; j++) {
+      const grassX = clumpX + (seededRandom() - 0.5) * clumpSize;
+      const grassY = clumpY + (seededRandom() - 0.5) * clumpSize;
+      const grassHeight = 3 + seededRandom() * 5;
+      const grassWidth = 1 + seededRandom() * 2;
       
+      // Individual grass blade with slight color variation
+      const hue = baseHue + (seededRandom() - 0.5) * 20;
+      const sat = baseSat + (seededRandom() - 0.5) * 20;
+      const lit = baseLit + (seededRandom() - 0.5) * 15;
+      
+      ctx.fillStyle = `hsl(${hue}, ${sat}%, ${lit}%)`;
+      ctx.globalAlpha = 0.6 + seededRandom() * 0.3;
+      
+      // Draw organic grass blade
       ctx.beginPath();
-      ctx.moveTo(startX, startY);
-      ctx.lineTo(endX, endY);
-      ctx.stroke();
-    } else {
-      // Small static grass dots
-      ctx.beginPath();
-      ctx.arc(x, y, 0.5, 0, Math.PI * 2);
+      ctx.ellipse(grassX, grassY, grassWidth, grassHeight, seededRandom() * Math.PI, 0, Math.PI * 2);
       ctx.fill();
     }
   }
-
+  
   ctx.globalAlpha = 1.0;
+};
+
+// Field variations for depth and interest
+const drawFieldVariations = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
+  let seed = 98765;
+  const seededRandom = () => {
+    seed = (seed * 9301 + 49297) % 233280;
+    return seed / 233280;
+  };
+
+  // Create subtle field variations (lighter and darker areas)
+  for (let i = 0; i < 25; i++) {
+    const x = seededRandom() * width;
+    const y = seededRandom() * height;
+    const size = 40 + seededRandom() * 80;
+    const isDark = seededRandom() > 0.5;
+    
+    // Create gradient for natural blending
+    const gradient = ctx.createRadialGradient(x, y, 0, x, y, size);
+    
+    if (isDark) {
+      gradient.addColorStop(0, 'rgba(51, 105, 30, 0.15)');   // Dark center
+      gradient.addColorStop(1, 'rgba(51, 105, 30, 0)');     // Fade to transparent
+    } else {
+      gradient.addColorStop(0, 'rgba(139, 195, 74, 0.12)'); // Light center
+      gradient.addColorStop(1, 'rgba(139, 195, 74, 0)');    // Fade to transparent
+    }
+    
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(x, y, size, 0, Math.PI * 2);
+    ctx.fill();
+  }
 };
 
 const drawWildflowerPatches = (ctx: CanvasRenderingContext2D, width: number, height: number) => {

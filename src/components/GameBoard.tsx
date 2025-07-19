@@ -666,7 +666,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     drawEnhancedMapBackground(ctx, GAME_WIDTH, GAME_HEIGHT);
 
     // Draw game elements in proper order
-    drawGrid(ctx);
     drawMapDecorations(ctx); // Draw decorations before path
     drawPath(ctx);
     drawTowers(ctx);
@@ -693,7 +692,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       ctx.fillText('Click to place defender', GAME_WIDTH / 2, 30);
       ctx.setLineDash([]);
     }
-  }, [gameState, drawGrid, drawPath, drawTowers, drawEnemies, drawProjectiles, particleSystem]);
+  }, [gameState, drawPath, drawTowers, drawEnemies, drawProjectiles, particleSystem]);
 
   useEffect(() => {
     draw();
