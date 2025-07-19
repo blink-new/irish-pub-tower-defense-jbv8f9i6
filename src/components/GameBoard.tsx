@@ -786,8 +786,20 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         return distance < 40;
       });
 
-      if (!isOnPath && !isOccupied) {
-        onTowerPlace({ x: gridX, y: gridY }, gameState.placingTowerType);
+      // Check if position is within game bounds
+      const isInBounds = gridX >= 0 && gridX <= GAME_WIDTH && gridY >= 0 && gridY <= GAME_HEIGHT;
+
+      if (!isOnPath && !isOccupied && isInBounds) {
+        try {
+          const success = onTowerPlace({ x: gridX, y: gridY }, gameState.placingTowerType);
+          if (!success) {
+            console.warn('⚠️ Tower placement failed - insufficient gold or other issue');
+          }
+        } catch (error) {
+          console.error('❌ Error placing tower:', error);
+        }
+      } else {
+        console.log('❌ Invalid placement:', { isOnPath, isOccupied, isInBounds, gridX, gridY });
       }
     } else {
       // Check if clicking on a tower

@@ -1171,11 +1171,11 @@ const drawPubEntrance = (ctx: CanvasRenderingContext2D, x: number, y: number) =>
   ctx.fill();
   ctx.stroke();
   
-  // Sign border (decorative)
+  // Sign border (decorative) - adjusted to give more space for text
   ctx.strokeStyle = '#FFD700'; // Gold border
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.roundRect(x - signWidth/2 + 3, y - pubHeight/2 - 15, signWidth - 6, signHeight - 6, 2);
+  ctx.roundRect(x - signWidth/2 + 5, y - pubHeight/2 - 15, signWidth - 10, signHeight - 6, 2);
   ctx.stroke();
   
   // Sign text (larger and more readable)

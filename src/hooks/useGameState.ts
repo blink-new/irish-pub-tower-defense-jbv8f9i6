@@ -46,9 +46,21 @@ export const useGameState = () => {
   const generateId = () => Math.random().toString(36).substr(2, 9);
 
   const placeTower = useCallback((position: Position, type: TowerType) => {
+    console.log(`🏗️ Attempting to place ${type} tower at position:`, position);
+    
+    let placementSuccess = false;
+    
     setGameState(prev => {
       const stats = TOWER_STATS[type];
-      if (!stats || prev.gold < stats.cost) return prev;
+      if (!stats) {
+        console.error(`❌ No stats found for tower type: ${type}`);
+        return prev;
+      }
+      
+      if (prev.gold < stats.cost) {
+        console.warn(`❌ Insufficient gold: need ${stats.cost}, have ${prev.gold}`);
+        return prev;
+      }
 
       const newTower: Tower = {
         id: generateId(),
@@ -64,21 +76,29 @@ export const useGameState = () => {
         totalDamage: 0
       };
 
-      // Play character-specific audio
-      if (type === 'bartender') {
-        // Play Paddy Losty's specific audio file
-        playPaddyLostyAudio();
-      } else if (type === 'bouncer') {
-        // Play Maureen's specific audio file
-        playMaureenAudio();
-      } else if (type === 'fiddler') {
-        // Play Prime Mutton's specific audio file
-        playPrimeMuttonAudio();
-      } else if (type === 'leprechaun') {
-        // Play John B Keane's specific audio file
-        playJohnBKeaneAudio();
-      } else {
-        // Fallback to generic tower placement sound
+      console.log(`✅ Successfully creating ${type} tower:`, newTower);
+      placementSuccess = true;
+
+      // Play character-specific audio - simple and reliable
+      try {
+        if (type === 'bartender') {
+          console.log('🗣️ Playing Paddy Losty audio...');
+          playPaddyLostyAudio();
+        } else if (type === 'bouncer') {
+          console.log('🗣️ Playing Maureen audio...');
+          playMaureenAudio();
+        } else if (type === 'fiddler') {
+          console.log('🗣️ Playing Prime Mutton audio...');
+          playPrimeMuttonAudio();
+        } else if (type === 'leprechaun') {
+          console.log('🗣️ Playing John B Keane audio...');
+          playJohnBKeaneAudio();
+        } else {
+          console.log('🗣️ Playing generic tower placement sound...');
+          soundManager.playSound('tower_place');
+        }
+      } catch (audioError) {
+        console.error('❌ Error playing tower audio:', audioError);
         soundManager.playSound('tower_place');
       }
 
@@ -90,7 +110,8 @@ export const useGameState = () => {
       };
     });
 
-    return true;
+    console.log(`🏗️ Tower placement result: ${placementSuccess ? 'SUCCESS' : 'FAILED'}`);
+    return placementSuccess;
   }, []);
 
   const spawnEnemy = useCallback((type: string) => {
