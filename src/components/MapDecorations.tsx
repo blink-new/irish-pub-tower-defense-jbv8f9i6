@@ -75,10 +75,6 @@ export const drawMapDecorations = (ctx: CanvasRenderingContext2D) => {
   // Draw pub signs
   drawSmallPubSign(ctx, 150, 180);
   
-  // Draw Celtic stone circles
-  drawCelticStoneCircle(ctx, 400, 100);
-  drawCelticStoneCircle(ctx, 700, 500);
-  
   // Draw shamrock patches
   const shamrockPatches = [
     { x: 120, y: 300 },
