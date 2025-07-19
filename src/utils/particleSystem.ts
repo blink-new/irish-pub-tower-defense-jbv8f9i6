@@ -227,40 +227,19 @@ export class ParticleSystem {
   }
 
   update(deltaTime: number) {
-    // Safety check for deltaTime
-    if (!deltaTime || typeof deltaTime !== 'number' || isNaN(deltaTime)) {
-      return;
-    }
+    // Temporarily disable all particle updates to debug green clusters
+    this.particles = [];
+    return;
     
     const dt = deltaTime / 1000; // Convert to seconds
     
-    // Safety check for particles array
-    if (!Array.isArray(this.particles)) {
-      this.particles = [];
-      return;
-    }
-    
     this.particles = this.particles.filter(particle => {
-      // Safety check for particle object
-      if (!particle || typeof particle !== 'object') {
-        return false;
-      }
-      
-      // Safety check for particle properties
-      if (!particle.position || !particle.velocity || typeof particle.life !== 'number') {
-        return false;
-      }
-      
-      // Update position safely
-      if (typeof particle.position.x === 'number' && typeof particle.velocity.x === 'number') {
-        particle.position.x += particle.velocity.x * dt;
-      }
-      if (typeof particle.position.y === 'number' && typeof particle.velocity.y === 'number') {
-        particle.position.y += particle.velocity.y * dt;
-      }
+      // Update position
+      particle.position.x += particle.velocity.x * dt;
+      particle.position.y += particle.velocity.y * dt;
       
       // Apply gravity to certain particle types
-      if ((particle.type === 'gold' || particle.type === 'explosion') && typeof particle.velocity.y === 'number') {
+      if (particle.type === 'gold' || particle.type === 'explosion') {
         particle.velocity.y += 200 * dt; // Gravity
       }
       
@@ -280,40 +259,18 @@ export class ParticleSystem {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    // Safety checks
-    if (!ctx || !Array.isArray(this.particles)) {
-      return;
-    }
-
     this.particles.forEach(particle => {
-      // Safety check for particle
-      if (!particle || typeof particle !== 'object' || typeof particle.life !== 'number' || typeof particle.maxLife !== 'number') {
-        return;
-      }
-
-      const alpha = particle.maxLife > 0 ? particle.life / particle.maxLife : 0;
-      
-      // Safety check for alpha value
-      if (isNaN(alpha) || alpha < 0) {
-        return;
-      }
+      const alpha = particle.life / particle.maxLife;
       
       ctx.save();
-      ctx.globalAlpha = Math.min(1, Math.max(0, alpha));
+      ctx.globalAlpha = alpha;
       
-      // Safety check for particle properties
-      if (!particle.position || typeof particle.position.x !== 'number' || typeof particle.position.y !== 'number' || 
-          typeof particle.size !== 'number' || !particle.color) {
-        ctx.restore();
-        return;
-      }
-
       // Different rendering for different particle types
       switch (particle.type) {
         case 'explosion':
           ctx.fillStyle = particle.color;
           ctx.beginPath();
-          ctx.arc(particle.position.x, particle.position.y, Math.max(0, particle.size), 0, Math.PI * 2);
+          ctx.arc(particle.position.x, particle.position.y, particle.size, 0, Math.PI * 2);
           ctx.fill();
           break;
           
@@ -322,7 +279,7 @@ export class ParticleSystem {
           ctx.strokeStyle = '#FFA500';
           ctx.lineWidth = 1;
           ctx.beginPath();
-          ctx.arc(particle.position.x, particle.position.y, Math.max(0, particle.size), 0, Math.PI * 2);
+          ctx.arc(particle.position.x, particle.position.y, particle.size, 0, Math.PI * 2);
           ctx.fill();
           ctx.stroke();
           break;
@@ -332,22 +289,20 @@ export class ParticleSystem {
           ctx.shadowColor = particle.color;
           ctx.shadowBlur = 5;
           ctx.beginPath();
-          ctx.arc(particle.position.x, particle.position.y, Math.max(0, particle.size), 0, Math.PI * 2);
+          ctx.arc(particle.position.x, particle.position.y, particle.size, 0, Math.PI * 2);
           ctx.fill();
           ctx.shadowBlur = 0;
           break;
           
-        case 'hit': {
+        case 'hit':
           ctx.fillStyle = particle.color;
-          const halfSize = Math.max(0, particle.size / 2);
           ctx.fillRect(
-            particle.position.x - halfSize,
-            particle.position.y - halfSize,
-            Math.max(0, particle.size),
-            Math.max(0, particle.size)
+            particle.position.x - particle.size / 2,
+            particle.position.y - particle.size / 2,
+            particle.size,
+            particle.size
           );
           break;
-        }
       }
       
       ctx.restore();

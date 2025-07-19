@@ -3,7 +3,6 @@ import { GameState, Tower, Enemy, Projectile, TowerType, Position } from '../typ
 import { TOWER_STATS, ENEMY_STATS, WAVES, GAME_PATH, SPECIAL_ATTACKS } from '../data/gameConfig';
 import { ParticleSystem } from '../utils/particleSystem';
 import { soundManager, playPaddyLostyAudio, playMaureenAudio, playPrimeMuttonAudio, playJohnBKeaneAudio } from '../utils/soundManager';
-import { checkAchievements } from '../data/achievements';
 
 const INITIAL_STATE: GameState = {
   gold: 200,
@@ -21,9 +20,7 @@ const INITIAL_STATE: GameState = {
   particles: [],
   isMusicMuted: false,
   isSoundFxMuted: false,
-  specialAttacks: Array.isArray(SPECIAL_ATTACKS) ? SPECIAL_ATTACKS.map(attack => ({ ...attack })) : [],
-  achievementProgress: {},
-  newAchievements: []
+  specialAttacks: SPECIAL_ATTACKS.map(attack => ({ ...attack }))
 };
 
 export const useGameState = () => {
@@ -192,38 +189,14 @@ export const useGameState = () => {
 
   const updateGame = useCallback((deltaTime: number) => {
     setGameState(prev => {
-      if (!prev || !prev.isPlaying || prev.isPaused) return prev;
-
-      // Safety check for deltaTime
-      if (!deltaTime || typeof deltaTime !== 'number' || isNaN(deltaTime) || deltaTime <= 0) {
-        return prev;
-      }
-
-      // Safety check for game state arrays - initialize if undefined
-      if (!Array.isArray(prev.enemies)) {
-        prev = { ...prev, enemies: [] };
-      }
-      if (!Array.isArray(prev.towers)) {
-        prev = { ...prev, towers: [] };
-      }
-      if (!Array.isArray(prev.projectiles)) {
-        prev = { ...prev, projectiles: [] };
-      }
-      if (!Array.isArray(prev.specialAttacks)) {
-        prev = { ...prev, specialAttacks: [] };
-      }
+      if (!prev.isPlaying || prev.isPaused) return prev;
 
       const newState = { ...prev };
       const currentTime = Date.now();
 
       // Update enemies movement
-      newState.enemies = (newState.enemies || []).filter(enemy => enemy != null && enemy !== undefined).map(enemy => {
-        if (!enemy || enemy.isDead || enemy.health <= 0) return enemy;
-
-        // Safety check for enemy properties
-        if (!enemy.position || typeof enemy.pathIndex !== 'number' || !GAME_PATH || GAME_PATH.length === 0) {
-          return enemy;
-        }
+      newState.enemies = newState.enemies.map(enemy => {
+        if (enemy.isDead || enemy.health <= 0) return enemy;
 
         // Move enemy along path
         const nextWaypointIndex = enemy.pathIndex + 1;
@@ -265,56 +238,46 @@ export const useGameState = () => {
       });
 
       // Remove dead enemies (either killed or reached end)
-      newState.enemies = (newState.enemies || []).filter(enemy => enemy && !enemy.isDead);
+      newState.enemies = newState.enemies.filter(enemy => !enemy.isDead);
 
       // Update towers and create projectiles
-      (newState.towers || []).forEach(tower => {
-        if (!tower || !tower.position || typeof tower.lastAttack !== 'number') return;
-        
-        if (currentTime - tower.lastAttack > (1000 / (tower.attackSpeed || 1))) {
+      newState.towers.forEach(tower => {
+        if (currentTime - tower.lastAttack > (1000 / tower.attackSpeed)) {
           // Find nearest alive enemy in range
-          const enemiesInRange = (newState.enemies || []).filter(enemy => {
-            if (!enemy || enemy.isDead || enemy.health <= 0 || !enemy.position) return false;
+          const enemiesInRange = newState.enemies.filter(enemy => {
+            if (enemy.isDead || enemy.health <= 0) return false;
             
             const dx = enemy.position.x - tower.position.x;
             const dy = enemy.position.y - tower.position.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
-            return distance <= (tower.range || 0);
+            return distance <= tower.range;
           });
 
           if (enemiesInRange.length > 0) {
             // Target the enemy that's furthest along the path
             const target = enemiesInRange.reduce((furthest, current) => 
-              (current && current.pathIndex > (furthest?.pathIndex || 0)) ? current : furthest
+              current.pathIndex > furthest.pathIndex ? current : furthest
             );
 
-            if (target && target.position) {
-              const projectile: Projectile = {
-                id: generateId(),
-                position: { ...tower.position },
-                target,
-                damage: tower.damage || 0,
-                speed: 200, // Reduced speed for better visibility
-                towerId: tower.id
-              };
+            const projectile: Projectile = {
+              id: generateId(),
+              position: { ...tower.position },
+              target,
+              damage: tower.damage,
+              speed: 200, // Reduced speed for better visibility
+              towerId: tower.id
+            };
 
-              if (!newState.projectiles) newState.projectiles = [];
-              newState.projectiles.push(projectile);
-              tower.lastAttack = currentTime;
-            }
+            newState.projectiles.push(projectile);
+            tower.lastAttack = currentTime;
           }
         }
       });
 
       // Update projectiles
-      newState.projectiles = (newState.projectiles || []).filter(projectile => projectile != null && projectile !== undefined).filter(projectile => {
-        // Safety check for projectile properties
-        if (!projectile || !projectile.target || !projectile.position || !projectile.target.position) {
-          return false;
-        }
-
-        const target = (newState.enemies || []).find(e => e && e.id === projectile.target?.id);
-        if (!target || target.isDead || target.health <= 0 || !target.position) {
+      newState.projectiles = newState.projectiles.filter(projectile => {
+        const target = newState.enemies.find(e => e.id === projectile.target.id);
+        if (!target || target.isDead || target.health <= 0) {
           return false; // Remove projectile if target is dead
         }
 
@@ -324,39 +287,31 @@ export const useGameState = () => {
 
         if (distance < 10) {
           // Hit target
-          target.health -= (projectile.damage || 0);
+          target.health -= projectile.damage;
           
           // Update tower stats
-          const tower = (newState.towers || []).find(t => t && t.id === projectile.towerId);
+          const tower = newState.towers.find(t => t.id === projectile.towerId);
           if (tower) {
-            tower.totalDamage = (tower.totalDamage || 0) + (projectile.damage || 0);
+            tower.totalDamage += projectile.damage;
           }
 
           // Create hit effect
-          if (particleSystemRef.current && typeof particleSystemRef.current.createHitEffect === 'function') {
-            particleSystemRef.current.createHitEffect(target.position);
-          }
+          particleSystemRef.current.createHitEffect(target.position);
           soundManager.playSound('enemy_hit');
 
           if (target.health <= 0) {
             target.isDead = true;
-            newState.gold += (target.gold || 0);
-            newState.score += (target.gold || 0) * 10;
+            newState.gold += target.gold;
+            newState.score += target.gold * 10;
             
             // Update tower kill count
             if (tower) {
-              tower.kills = (tower.kills || 0) + 1;
+              tower.kills += 1;
             }
 
             // Create death effects
-            if (particleSystemRef.current) {
-              if (typeof particleSystemRef.current.createExplosion === 'function') {
-                particleSystemRef.current.createExplosion(target.position, '#FF4444');
-              }
-              if (typeof particleSystemRef.current.createGoldEffect === 'function') {
-                particleSystemRef.current.createGoldEffect(target.position);
-              }
-            }
+            particleSystemRef.current.createExplosion(target.position, '#FF4444');
+            particleSystemRef.current.createGoldEffect(target.position);
             soundManager.playSound('enemy_death');
             
             // Play coin collection sound after a short delay
@@ -379,12 +334,12 @@ export const useGameState = () => {
 
       // Check if wave is complete (all enemies spawned AND no enemies left)
       if (newState.isPlaying && 
-          (newState.enemies || []).length === 0 && 
+          newState.enemies.length === 0 && 
           enemiesSpawnedRef.current >= totalEnemiesInWaveRef.current &&
           totalEnemiesInWaveRef.current > 0) {
         const currentWave = WAVES[newState.wave - 1];
         if (currentWave) {
-          newState.gold += (currentWave.reward || 0);
+          newState.gold += currentWave.reward;
           newState.wave++;
           newState.isPlaying = false;
           
@@ -405,33 +360,19 @@ export const useGameState = () => {
       }
 
       // Update special attack cooldowns
-      newState.specialAttacks = (newState.specialAttacks || []).map(attack => ({
+      newState.specialAttacks = newState.specialAttacks.map(attack => ({
         ...attack,
-        currentCooldown: Math.max(0, (attack.currentCooldown || 0) - deltaTime)
+        currentCooldown: Math.max(0, attack.currentCooldown - deltaTime)
       }));
 
       // Update particle system
-      if (particleSystemRef.current && typeof particleSystemRef.current.update === 'function') {
-        particleSystemRef.current.update(deltaTime);
-      }
+      particleSystemRef.current.update(deltaTime);
 
       // Check game over
       if (newState.lives <= 0) {
         newState.isPlaying = false;
         newState.isPaused = true;
         soundManager.playSound('game_over');
-      }
-
-      // Check for new achievements
-      const newlyUnlocked = checkAchievements(newState, newState.achievementProgress);
-      if (newlyUnlocked.length > 0) {
-        newlyUnlocked.forEach(achievement => {
-          newState.achievementProgress[achievement.id] = {
-            unlocked: true,
-            unlockedAt: new Date()
-          };
-          newState.newAchievements.push(achievement.id);
-        });
       }
 
       return newState;
@@ -441,20 +382,10 @@ export const useGameState = () => {
   // Game loop
   useEffect(() => {
     const gameLoop = (currentTime: number) => {
-      // Safety check for currentTime
-      if (!currentTime || typeof currentTime !== 'number' || isNaN(currentTime)) {
-        gameLoopRef.current = requestAnimationFrame(gameLoop);
-        return;
-      }
-
       const deltaTime = currentTime - lastTimeRef.current;
       
-      // Safety check for deltaTime and prevent excessive values
-      if (deltaTime > 16 && deltaTime < 1000) { // ~60 FPS, but cap at 1 second
+      if (deltaTime > 16) { // ~60 FPS
         updateGame(deltaTime);
-        lastTimeRef.current = currentTime;
-      } else if (deltaTime >= 1000) {
-        // Reset timer if too much time has passed (e.g., tab was inactive)
         lastTimeRef.current = currentTime;
       }
       
@@ -499,19 +430,17 @@ export const useGameState = () => {
 
   const useSpecialAttack = useCallback((attackId: string, position?: { x: number; y: number }) => {
     setGameState(prev => {
-      if (!prev || !prev.specialAttacks) return prev;
-      
-      const attack = prev.specialAttacks.find(a => a && a.id === attackId);
-      if (!attack || (attack.currentCooldown || 0) > 0) {
+      const attack = prev.specialAttacks.find(a => a.id === attackId);
+      if (!attack || attack.currentCooldown > 0) {
         return prev;
       }
 
       const newState = { ...prev };
       
       // Start cooldown (no cost since they're free now)
-      newState.specialAttacks = (newState.specialAttacks || []).map(a => 
-        a && a.id === attackId 
-          ? { ...a, currentCooldown: a.cooldown || 0 }
+      newState.specialAttacks = newState.specialAttacks.map(a => 
+        a.id === attackId 
+          ? { ...a, currentCooldown: a.cooldown }
           : a
       );
 
@@ -521,27 +450,23 @@ export const useGameState = () => {
         // Peanuts: Stun enemies in target area for 3 seconds
         const affectedEnemies: string[] = [];
         
-        newState.enemies = (newState.enemies || []).map(enemy => {
-          if (!enemy || !enemy.position) return enemy;
-          
+        newState.enemies = newState.enemies.map(enemy => {
           const dx = enemy.position.x - targetPosition.x;
           const dy = enemy.position.y - targetPosition.y;
           const distance = Math.sqrt(dx * dx + dy * dy);
           
-          if (distance <= (attack.radius || 0)) {
+          if (distance <= attack.radius) {
             affectedEnemies.push(enemy.id);
             return {
               ...enemy,
-              speed: (enemy.speed || 0) * 0.1 // Slow to 10% speed for stun effect
+              speed: enemy.speed * 0.1 // Slow to 10% speed for stun effect
             };
           }
           return enemy;
         });
 
         // Create peanut particle effects at target location
-        if (particleSystemRef.current && typeof particleSystemRef.current.createPeanutEffect === 'function') {
-          particleSystemRef.current.createPeanutEffect(targetPosition, attack.radius || 0);
-        }
+        particleSystemRef.current.createPeanutEffect(targetPosition, attack.radius);
         
         // Play special attack voice line for Peanuts
         soundManager.playSpecialAttackAudio('peanuts', 0.8).catch(error => {
@@ -553,9 +478,9 @@ export const useGameState = () => {
         setTimeout(() => {
           setGameState(current => ({
             ...current,
-            enemies: (current.enemies || []).map(enemy => 
-              enemy && affectedEnemies.includes(enemy.id)
-                ? { ...enemy, speed: (enemy.speed || 0) / 0.1 } // Restore original speed
+            enemies: current.enemies.map(enemy => 
+              affectedEnemies.includes(enemy.id)
+                ? { ...enemy, speed: enemy.speed / 0.1 } // Restore original speed
                 : enemy
             )
           }));
@@ -563,36 +488,26 @@ export const useGameState = () => {
 
       } else if (attackId === 'shirt_rip') {
         // Shirt Rip: Area damage to enemies in target location
-        newState.enemies = (newState.enemies || []).map(enemy => {
-          if (!enemy || !enemy.position) return enemy;
-          
+        newState.enemies = newState.enemies.map(enemy => {
           const dx = enemy.position.x - targetPosition.x;
           const dy = enemy.position.y - targetPosition.y;
           const distance = Math.sqrt(dx * dx + dy * dy);
           
-          if (distance <= (attack.radius || 0)) {
+          if (distance <= attack.radius) {
             const newEnemy = { ...enemy };
-            newEnemy.health -= (attack.damage || 0);
+            newEnemy.health -= attack.damage;
             
             if (newEnemy.health <= 0) {
               newEnemy.isDead = true;
-              newState.gold += (newEnemy.gold || 0);
-              newState.score += (newEnemy.gold || 0) * 10;
+              newState.gold += newEnemy.gold;
+              newState.score += newEnemy.gold * 10;
               
               // Create death effects
-              if (particleSystemRef.current) {
-                if (typeof particleSystemRef.current.createExplosion === 'function') {
-                  particleSystemRef.current.createExplosion(newEnemy.position, '#FF4444');
-                }
-                if (typeof particleSystemRef.current.createGoldEffect === 'function') {
-                  particleSystemRef.current.createGoldEffect(newEnemy.position);
-                }
-              }
+              particleSystemRef.current.createExplosion(newEnemy.position, '#FF4444');
+              particleSystemRef.current.createGoldEffect(newEnemy.position);
             } else {
               // Create damage effect
-              if (particleSystemRef.current && typeof particleSystemRef.current.createHitEffect === 'function') {
-                particleSystemRef.current.createHitEffect(newEnemy.position);
-              }
+              particleSystemRef.current.createHitEffect(newEnemy.position);
             }
             
             return newEnemy;
@@ -601,9 +516,7 @@ export const useGameState = () => {
         });
 
         // Create shirt rip effect at target location
-        if (particleSystemRef.current && typeof particleSystemRef.current.createShirtRipEffect === 'function') {
-          particleSystemRef.current.createShirtRipEffect(targetPosition, attack.radius || 0);
-        }
+        particleSystemRef.current.createShirtRipEffect(targetPosition, attack.radius);
         
         // Play special attack voice line for Shirt
         soundManager.playSpecialAttackAudio('shirt', 0.8).catch(error => {
@@ -680,14 +593,6 @@ export const useGameState = () => {
     return particleSystemRef.current;
   }, []);
 
-  // Clear achievement notifications
-  const clearAchievementNotification = useCallback((achievementId: string) => {
-    setGameState(prev => ({
-      ...prev,
-      newAchievements: prev.newAchievements.filter(id => id !== achievementId)
-    }));
-  }, []);
-
   return {
     gameState,
     placeTower,
@@ -702,7 +607,6 @@ export const useGameState = () => {
     toggleSoundFx,
     toggleSound, // Legacy method
     getParticleSystem,
-    useSpecialAttack,
-    clearAchievementNotification
+    useSpecialAttack
   };
 };

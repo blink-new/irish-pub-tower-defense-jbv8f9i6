@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Play, Pause, RotateCcw, FastForward, Volume2, VolumeX, Zap, ZapOff } from 'lucide-react';
 import { soundManager } from '../utils/soundManager';
-import { GameStats } from './GameStats';
 
 interface GameUIProps {
   gameState: GameState;
@@ -248,9 +247,6 @@ export const GameUI: React.FC<GameUIProps> = ({
           ))}
         </CardContent>
       </Card>
-
-      {/* Game Statistics */}
-      <GameStats gameState={gameState} />
 
       {/* Selected Tower Info - Now appears on map */}
       {gameState.selectedTower && (

@@ -69,8 +69,6 @@ export interface GameState {
   isMusicMuted: boolean;
   isSoundFxMuted: boolean;
   specialAttacks: SpecialAttack[];
-  achievementProgress: { [achievementId: string]: { unlocked: boolean; unlockedAt?: Date } };
-  newAchievements: string[];
 }
 
 export type TowerType = 'bartender' | 'bouncer' | 'fiddler' | 'leprechaun';

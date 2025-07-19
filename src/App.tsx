@@ -1,17 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { GameBoard } from './components/GameBoard';
 import { GameUI } from './components/GameUI';
 import { AuthWrapper } from './components/AuthWrapper';
-import { AchievementNotification } from './components/AchievementNotification';
-import { AchievementPanel } from './components/AchievementPanel';
 import { useGameState } from './hooks/useGameState';
 import { TowerType } from './types/game';
-import { ACHIEVEMENTS } from './data/achievements';
-import { Button } from './components/ui/button';
-import { Trophy } from 'lucide-react';
 
 function App() {
-  const [showAchievements, setShowAchievements] = useState(false);
   
   const {
     gameState,
@@ -26,8 +20,7 @@ function App() {
     toggleMusic,
     toggleSoundFx,
     getParticleSystem,
-    useSpecialAttack,
-    clearAchievementNotification
+    useSpecialAttack
   } = useGameState();
 
   const handleTowerPlace = (position: { x: number; y: number }, type: TowerType) => {
@@ -49,37 +42,19 @@ function App() {
         {/* Header */}
         <header className="bg-primary border-b-2 border-accent p-4">
           <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <img 
-                  src="/Paddy Losty Sticker_.jpg" 
-                  alt="Paddy Losty" 
-                  className="w-16 h-16 rounded-full border-4 border-accent shadow-lg object-cover"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    console.error('Failed to load Paddy Losty image');
-                  }}
-                />
-                <div className="text-center">
-                  <h1 className="text-4xl font-celtic text-accent">
-                    Irish Pub Tower Defense 🍺
-                  </h1>
-                  <p className="text-primary-foreground mt-1 font-medium">
-                    Help Paddy Losty defend the pub from mythical creatures!
-                  </p>
-                </div>
-              </div>
-              
-              {/* Achievement Button */}
-              <Button
-                onClick={() => setShowAchievements(true)}
-                variant="outline"
-                className="border-accent text-accent hover:bg-accent hover:text-accent-foreground"
-              >
-                <Trophy className="w-4 h-4 mr-2" />
-                Achievements
-              </Button>
-              
+            <div className="flex items-center justify-center gap-4">
+              <img 
+                src="/Paddy Losty Sticker_.jpg" 
+                alt="Paddy Losty" 
+                className="w-16 h-16 rounded-full border-4 border-accent shadow-lg object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  console.error('Failed to load Paddy Losty image');
+                }}
+              />
+              <h1 className="text-4xl font-celtic text-accent text-center">
+                Irish Pub Tower Defense 🍺
+              </h1>
               <img 
                 src="/Paddy Losty Sticker_.jpg" 
                 alt="Paddy Losty" 
@@ -90,6 +65,9 @@ function App() {
                 }}
               />
             </div>
+            <p className="text-center text-primary-foreground mt-2 font-medium">
+              Help Paddy Losty defend the pub from mythical creatures with your trusty Irish defenders!
+            </p>
           </div>
         </header>
 
@@ -163,28 +141,6 @@ function App() {
             </div>
           </div>
         </footer>
-
-        {/* Achievement Notifications */}
-        {gameState.newAchievements.map((achievementId) => {
-          const achievement = ACHIEVEMENTS.find(a => a.id === achievementId);
-          if (!achievement) return null;
-          
-          return (
-            <AchievementNotification
-              key={achievementId}
-              achievement={achievement}
-              onClose={() => clearAchievementNotification(achievementId)}
-            />
-          );
-        })}
-
-        {/* Achievement Panel */}
-        {showAchievements && (
-          <AchievementPanel
-            progress={gameState.achievementProgress}
-            onClose={() => setShowAchievements(false)}
-          />
-        )}
       </div>
     </AuthWrapper>
   );

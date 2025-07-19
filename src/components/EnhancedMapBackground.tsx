@@ -1,66 +1,29 @@
-// Enhanced map background with lush fantasy field terrain like Realm Defense
+// Enhanced map background with professional textures and effects
 export const drawEnhancedMapBackground = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
-  // Create rich, vibrant grass background with depth and lighting variation
-  const bgGradient = ctx.createLinearGradient(0, 0, width, height);
-  bgGradient.addColorStop(0, '#2E7D32');    // Deep forest green (top-left)
-  bgGradient.addColorStop(0.3, '#388E3C');  // Rich green
-  bgGradient.addColorStop(0.6, '#4CAF50');  // Vibrant green
-  bgGradient.addColorStop(0.8, '#66BB6A');  // Bright green
-  bgGradient.addColorStop(1, '#81C784');    // Light green (bottom-right)
+  // Create a more sophisticated grass background
+  const bgGradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, Math.max(width, height));
+  bgGradient.addColorStop(0, '#4F7942');  // Darker forest green center
+  bgGradient.addColorStop(0.4, '#3CB371'); // Medium sea green
+  bgGradient.addColorStop(0.7, '#32CD32'); // Lime green
+  bgGradient.addColorStop(1, '#228B22');   // Forest green edges
   
   ctx.fillStyle = bgGradient;
   ctx.fillRect(0, 0, width, height);
 
-  // Add subtle lighting variation with overlapping gradients
-  drawLightingVariation(ctx, width, height);
-  
-  // Create lush grass texture with multiple detailed layers
-  drawDetailedGrassTexture(ctx, width, height, 0.08, '#1B5E20', 1200); // Deep shadow layer
-  drawDetailedGrassTexture(ctx, width, height, 0.12, '#2E7D32', 900);  // Dark base layer
-  drawDetailedGrassTexture(ctx, width, height, 0.15, '#388E3C', 700);  // Medium layer
-  drawDetailedGrassTexture(ctx, width, height, 0.18, '#4CAF50', 500);  // Bright layer
-  drawDetailedGrassTexture(ctx, width, height, 0.22, '#66BB6A', 300);  // Light highlights
-  drawDetailedGrassTexture(ctx, width, height, 0.25, '#81C784', 150);  // Brightest highlights
+  // Add depth with multiple grass layers
+  drawGrassLayer(ctx, width, height, 0.05, '#1F4F1F', 800); // Dark base layer
+  drawGrassLayer(ctx, width, height, 0.1, '#228B22', 600);  // Medium layer
+  drawGrassLayer(ctx, width, height, 0.15, '#32CD32', 400); // Bright layer
+  drawGrassLayer(ctx, width, height, 0.2, '#90EE90', 200);  // Light highlights
 
-  // Add natural terrain features for depth
-  drawWornPatches(ctx, width, height);
-  drawGrassTufts(ctx, width, height);
+  // Add natural elements
   drawWildflowerPatches(ctx, width, height);
   drawDirtPatches(ctx, width, height);
   drawRockFormations(ctx, width, height);
   drawMossPatches(ctx, width, height);
-  drawShadowAreas(ctx, width, height);
 };
 
-// Add subtle lighting variation for depth
-const drawLightingVariation = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
-  // Create multiple overlapping light sources for natural variation
-  const lightSources = [
-    { x: width * 0.3, y: height * 0.2, radius: width * 0.4, intensity: 0.15 },
-    { x: width * 0.7, y: height * 0.6, radius: width * 0.5, intensity: 0.12 },
-    { x: width * 0.1, y: height * 0.8, radius: width * 0.3, intensity: 0.08 }
-  ];
-
-  lightSources.forEach(light => {
-    const gradient = ctx.createRadialGradient(light.x, light.y, 0, light.x, light.y, light.radius);
-    gradient.addColorStop(0, `rgba(255, 255, 255, ${light.intensity})`);
-    gradient.addColorStop(0.6, `rgba(255, 255, 255, ${light.intensity * 0.5})`);
-    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-    
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, width, height);
-  });
-
-  // Add shadow areas for contrast
-  const shadowGradient = ctx.createLinearGradient(0, 0, width * 0.3, height * 0.3);
-  shadowGradient.addColorStop(0, 'rgba(0, 0, 0, 0.1)');
-  shadowGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-  ctx.fillStyle = shadowGradient;
-  ctx.fillRect(0, 0, width, height);
-};
-
-// Enhanced grass texture with more variety and detail
-const drawDetailedGrassTexture = (
+const drawGrassLayer = (
   ctx: CanvasRenderingContext2D, 
   width: number, 
   height: number, 
@@ -85,126 +48,30 @@ const drawDetailedGrassTexture = (
     const y = seededRandom() * height;
     const grassType = seededRandom();
 
-    if (grassType < 0.4) {
-      // Varied grass blades with different heights and widths
-      const bladeHeight = 1 + seededRandom() * 4;
-      const bladeWidth = 0.5 + seededRandom() * 1.5;
-      ctx.fillRect(x, y, bladeWidth, bladeHeight);
-    } else if (grassType < 0.7) {
-      // Curved grass strands for more natural look
+    if (grassType < 0.7) {
+      // Short static grass blades
+      const bladeHeight = 1 + seededRandom() * 2;
+      ctx.fillRect(x, y, 1, bladeHeight);
+    } else if (grassType < 0.95) {
+      // Medium grass strands - static positions
       const startX = x;
       const startY = y;
-      const controlX = x + (seededRandom() - 0.5) * 4;
-      const controlY = y - 1 - seededRandom() * 2;
-      const endX = x + (seededRandom() - 0.5) * 3;
-      const endY = y - 2 - seededRandom() * 4;
-      
-      ctx.beginPath();
-      ctx.moveTo(startX, startY);
-      ctx.quadraticCurveTo(controlX, controlY, endX, endY);
-      ctx.stroke();
-    } else if (grassType < 0.9) {
-      // Small grass clusters
-      const clusterSize = 1 + seededRandom() * 2;
-      ctx.beginPath();
-      ctx.arc(x, y, clusterSize * 0.5, 0, Math.PI * 2);
-      ctx.fill();
-    } else {
-      // Tiny grass dots for texture
-      ctx.beginPath();
-      ctx.arc(x, y, 0.3 + seededRandom() * 0.4, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-
-  ctx.globalAlpha = 1.0;
-};
-
-// Add worn patches where grass is thinner (like paths or heavy traffic areas)
-const drawWornPatches = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
-  let seed = 98765;
-  const seededRandom = () => {
-    seed = (seed * 9301 + 49297) % 233280;
-    return seed / 233280;
-  };
-
-  for (let i = 0; i < 8; i++) {
-    const x = seededRandom() * width;
-    const y = seededRandom() * height;
-    const size = 15 + seededRandom() * 25;
-    const rotation = seededRandom() * Math.PI;
-    
-    // Create worn patch with darker, less vibrant grass
-    const gradient = ctx.createRadialGradient(x, y, 0, x, y, size);
-    gradient.addColorStop(0, 'rgba(46, 125, 50, 0.3)'); // Darker green center
-    gradient.addColorStop(0.7, 'rgba(56, 142, 60, 0.2)'); // Medium green
-    gradient.addColorStop(1, 'rgba(76, 175, 80, 0.1)'); // Light green edge
-    
-    ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.ellipse(x, y, size, size * 0.6, rotation, 0, Math.PI * 2);
-    ctx.fill();
-  }
-};
-
-// Add tufts of longer grass for texture variation
-const drawGrassTufts = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
-  let seed = 13579;
-  const seededRandom = () => {
-    seed = (seed * 9301 + 49297) % 233280;
-    return seed / 233280;
-  };
-
-  for (let i = 0; i < 25; i++) {
-    const x = seededRandom() * width;
-    const y = seededRandom() * height;
-    const tuftSize = 3 + seededRandom() * 5;
-    const grassCount = 4 + Math.floor(seededRandom() * 6);
-    
-    ctx.strokeStyle = `rgba(56, 142, 60, ${0.4 + seededRandom() * 0.3})`;
-    ctx.lineWidth = 1 + seededRandom() * 0.5;
-    
-    for (let j = 0; j < grassCount; j++) {
-      const angle = (j / grassCount) * Math.PI * 2 + seededRandom() * 0.5;
-      const length = tuftSize + seededRandom() * 3;
-      const startX = x + Math.cos(angle) * (tuftSize * 0.3);
-      const startY = y + Math.sin(angle) * (tuftSize * 0.3);
-      const endX = startX + Math.cos(angle - 0.2) * length;
-      const endY = startY + Math.sin(angle - 0.2) * length;
+      const endX = x + (seededRandom() - 0.5) * 2; // Reduced movement
+      const endY = y - 1 - seededRandom() * 3;
       
       ctx.beginPath();
       ctx.moveTo(startX, startY);
       ctx.lineTo(endX, endY);
       ctx.stroke();
+    } else {
+      // Small static grass dots
+      ctx.beginPath();
+      ctx.arc(x, y, 0.5, 0, Math.PI * 2);
+      ctx.fill();
     }
   }
-};
 
-// Add shadow areas for depth and realism
-const drawShadowAreas = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
-  let seed = 24680;
-  const seededRandom = () => {
-    seed = (seed * 9301 + 49297) % 233280;
-    return seed / 233280;
-  };
-
-  for (let i = 0; i < 6; i++) {
-    const x = seededRandom() * width;
-    const y = seededRandom() * height;
-    const size = 20 + seededRandom() * 40;
-    const rotation = seededRandom() * Math.PI;
-    
-    // Create subtle shadow areas
-    const gradient = ctx.createRadialGradient(x, y, 0, x, y, size);
-    gradient.addColorStop(0, 'rgba(0, 0, 0, 0.15)');
-    gradient.addColorStop(0.6, 'rgba(0, 0, 0, 0.08)');
-    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-    
-    ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.ellipse(x, y, size, size * 0.7, rotation, 0, Math.PI * 2);
-    ctx.fill();
-  }
+  ctx.globalAlpha = 1.0;
 };
 
 const drawWildflowerPatches = (ctx: CanvasRenderingContext2D, width: number, height: number) => {

@@ -835,11 +835,11 @@ export class SoundManager {
     this.setSoundFxMuted(muted);
   }
 
-  isMusicMutedStatus() {
+  isMusicMuted() {
     return this.isMusicMuted;
   }
 
-  isSoundFxMutedStatus() {
+  isSoundFxMuted() {
     return this.isSoundFxMuted;
   }
 

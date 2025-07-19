@@ -4,11 +4,9 @@ import { GAME_PATH, GRID_SIZE, GAME_WIDTH, GAME_HEIGHT } from '../data/gameConfi
 import { TowerUpgradeOverlay } from './TowerUpgradeOverlay';
 import { SpecialAttacks } from './SpecialAttacks';
 import { TowerIcon, EnemyIcon } from './TowerIcons';
-
+import { drawMapDecorations } from './MapDecorations';
 import { drawEnhancedTowerIcon, drawEnhancedEnemyIcon } from './EnhancedTowerGraphics';
 import { drawEnhancedMapBackground } from './EnhancedMapBackground';
-import MapDecorations from './MapDecorations';
-import { EnhancedEffects } from './EnhancedEffects';
 
 interface GameBoardProps {
   gameState: GameState;
@@ -223,216 +221,105 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   }, []);
 
   const drawPath = useCallback((ctx: CanvasRenderingContext2D) => {
-    // Draw natural dirt path with embedded shadows and organic edges
-    
-    // First, draw the deepest shadow layer (embedded in ground)
-    ctx.strokeStyle = 'rgba(101, 67, 33, 0.4)'; // Dark brown shadow
-    ctx.lineWidth = 52;
+    // Draw path shadow/border first (darkest)
+    ctx.strokeStyle = '#4A4A4A';
+    ctx.lineWidth = 48;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     
     ctx.beginPath();
     ctx.moveTo(GAME_PATH[0].x, GAME_PATH[0].y);
+    
     for (let i = 1; i < GAME_PATH.length; i++) {
       ctx.lineTo(GAME_PATH[i].x, GAME_PATH[i].y);
     }
+    
     ctx.stroke();
 
-    // Draw the main dirt path with varied earth tones
-    const pathGradient = ctx.createLinearGradient(0, 0, 900, 600);
-    pathGradient.addColorStop(0, '#8B4513');    // Saddle brown
-    pathGradient.addColorStop(0.2, '#A0522D');  // Sienna
-    pathGradient.addColorStop(0.4, '#CD853F');  // Peru
-    pathGradient.addColorStop(0.6, '#D2B48C');  // Tan
-    pathGradient.addColorStop(0.8, '#DEB887');  // Burlywood
-    pathGradient.addColorStop(1, '#F5DEB3');    // Wheat
-    
-    ctx.strokeStyle = pathGradient;
-    ctx.lineWidth = 46;
+    // Draw path border (darker brown)
+    ctx.strokeStyle = '#654321';
+    ctx.lineWidth = 44;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     
     ctx.beginPath();
     ctx.moveTo(GAME_PATH[0].x, GAME_PATH[0].y);
+    
     for (let i = 1; i < GAME_PATH.length; i++) {
       ctx.lineTo(GAME_PATH[i].x, GAME_PATH[i].y);
     }
+    
     ctx.stroke();
 
-    // Add worn path center with lighter, compacted earth
-    const centerGradient = ctx.createLinearGradient(0, 0, 900, 600);
-    centerGradient.addColorStop(0, '#DEB887');  // Burlywood
-    centerGradient.addColorStop(0.5, '#F5DEB3'); // Wheat
-    centerGradient.addColorStop(1, '#FAEBD7');   // Antique white
+    // Draw main path (cobblestone base)
+    const gradient = ctx.createLinearGradient(0, 0, 900, 600);
+    gradient.addColorStop(0, '#D2B48C');
+    gradient.addColorStop(0.5, '#DEB887');
+    gradient.addColorStop(1, '#F5DEB3');
     
-    ctx.strokeStyle = centerGradient;
-    ctx.lineWidth = 32;
+    ctx.strokeStyle = gradient;
+    ctx.lineWidth = 40;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     
     ctx.beginPath();
     ctx.moveTo(GAME_PATH[0].x, GAME_PATH[0].y);
+    
     for (let i = 1; i < GAME_PATH.length; i++) {
       ctx.lineTo(GAME_PATH[i].x, GAME_PATH[i].y);
     }
-    ctx.stroke();
-
-    // Add natural path details and texture
-    drawPathTexture(ctx);
-    drawPathEdges(ctx);
-    drawWheelMarks(ctx);
-    drawPathPebbles(ctx);
-    drawPathWear(ctx);
-  }, []);
-
-  // Draw natural path texture with varied dirt and compacted areas
-  const drawPathTexture = (ctx: CanvasRenderingContext2D) => {
-    const dirtColors = ['#8B4513', '#A0522D', '#CD853F', '#D2B48C', '#DEB887'];
     
-    let textureSeed = 54321;
-    const textureRandom = () => {
-      textureSeed = (textureSeed * 9301 + 49297) % 233280;
-      return textureSeed / 233280;
+    ctx.stroke();
+    
+    // Add static cobblestone texture
+    const cobblestoneColors = ['#CD853F', '#A0522D', '#8B7355', '#D2B48C'];
+    
+    // Use seeded random for consistent cobblestone placement
+    let cobbleSeed = 98765;
+    const cobbleRandom = () => {
+      cobbleSeed = (cobbleSeed * 9301 + 49297) % 233280;
+      return cobbleSeed / 233280;
     };
     
     for (let i = 0; i < GAME_PATH.length - 1; i++) {
       const start = GAME_PATH[i];
       const end = GAME_PATH[i + 1];
       const distance = Math.sqrt(Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2));
-      const segments = Math.floor(distance / 8);
+      const segments = Math.floor(distance / 15);
       
       for (let j = 0; j < segments; j++) {
         const t = j / segments;
         const x = start.x + (end.x - start.x) * t;
         const y = start.y + (end.y - start.y) * t;
         
-        // Add varied dirt patches for natural texture
-        if (textureRandom() < 0.3) {
-          const patchSize = 2 + textureRandom() * 4;
-          const offsetX = (textureRandom() - 0.5) * 20;
-          const offsetY = (textureRandom() - 0.5) * 20;
-          const colorIndex = Math.floor(textureRandom() * dirtColors.length);
-          
-          ctx.fillStyle = dirtColors[colorIndex];
-          ctx.globalAlpha = 0.3 + textureRandom() * 0.4;
-          ctx.beginPath();
-          ctx.ellipse(x + offsetX, y + offsetY, patchSize, patchSize * 0.7, textureRandom() * Math.PI, 0, Math.PI * 2);
-          ctx.fill();
-        }
+        // Draw individual static cobblestones
+        const stoneSize = 3 + cobbleRandom() * 2;
+        const offsetX = (cobbleRandom() - 0.5) * 12;
+        const offsetY = (cobbleRandom() - 0.5) * 12;
+        const rotation = cobbleRandom() * Math.PI;
+        
+        const colorIndex = Math.floor(cobbleRandom() * cobblestoneColors.length);
+        ctx.fillStyle = cobblestoneColors[colorIndex];
+        ctx.strokeStyle = '#8B7355';
+        ctx.lineWidth = 0.5;
+        
+        ctx.beginPath();
+        ctx.ellipse(x + offsetX, y + offsetY, stoneSize, stoneSize * 0.8, rotation, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
       }
     }
-    ctx.globalAlpha = 1.0;
-  };
-
-  // Draw soft, faded edges that blend with grass
-  const drawPathEdges = (ctx: CanvasRenderingContext2D) => {
-    let edgeSeed = 13579;
-    const edgeRandom = () => {
-      edgeSeed = (edgeSeed * 9301 + 49297) % 233280;
-      return edgeSeed / 233280;
-    };
     
-    for (let i = 0; i < GAME_PATH.length - 1; i++) {
-      const start = GAME_PATH[i];
-      const end = GAME_PATH[i + 1];
-      const distance = Math.sqrt(Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2));
-      const segments = Math.floor(distance / 10);
-      
-      for (let j = 0; j < segments; j++) {
-        const t = j / segments;
-        const x = start.x + (end.x - start.x) * t;
-        const y = start.y + (end.y - start.y) * t;
-        
-        // Calculate perpendicular direction for edge effects
-        const dx = end.x - start.x;
-        const dy = end.y - start.y;
-        const length = Math.sqrt(dx * dx + dy * dy);
-        const perpX = -dy / length;
-        const perpY = dx / length;
-        
-        // Draw faded grass edges that blend into path
-        for (let side = -1; side <= 1; side += 2) {
-          const edgeDistance = 20 + edgeRandom() * 8;
-          const grassX = x + perpX * side * edgeDistance;
-          const grassY = y + perpY * side * edgeDistance;
-          
-          // Faded grass transition
-          const fadeGradient = ctx.createRadialGradient(grassX, grassY, 0, grassX, grassY, 8);
-          fadeGradient.addColorStop(0, 'rgba(34, 139, 34, 0.6)');
-          fadeGradient.addColorStop(0.5, 'rgba(34, 139, 34, 0.3)');
-          fadeGradient.addColorStop(1, 'rgba(34, 139, 34, 0)');
-          
-          ctx.fillStyle = fadeGradient;
-          ctx.beginPath();
-          ctx.arc(grassX, grassY, 6 + edgeRandom() * 4, 0, Math.PI * 2);
-          ctx.fill();
-          
-          // Sparse grass blades at path edge
-          if (edgeRandom() < 0.4) {
-            ctx.strokeStyle = `rgba(34, 139, 34, ${0.3 + edgeRandom() * 0.3})`;
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(grassX, grassY);
-            ctx.lineTo(grassX + (edgeRandom() - 0.5) * 4, grassY - 2 - edgeRandom() * 3);
-            ctx.stroke();
-          }
-        }
-      }
-    }
-  };
-
-  // Draw wheel marks and cart tracks for realism
-  const drawWheelMarks = (ctx: CanvasRenderingContext2D) => {
-    let wheelSeed = 24680;
-    const wheelRandom = () => {
-      wheelSeed = (wheelSeed * 9301 + 49297) % 233280;
-      return wheelSeed / 233280;
-    };
-    
-    ctx.strokeStyle = 'rgba(101, 67, 33, 0.4)';
+    // Add static path edge grass
+    ctx.strokeStyle = '#228B22';
     ctx.lineWidth = 2;
-    ctx.setLineDash([4, 6, 2, 6]);
+    ctx.globalAlpha = 0.4;
     
-    for (let track = 0; track < 2; track++) {
-      const offset = track === 0 ? -8 : 8; // Left and right wheel tracks
-      
-      for (let i = 0; i < GAME_PATH.length - 1; i++) {
-        const start = GAME_PATH[i];
-        const end = GAME_PATH[i + 1];
-        
-        // Calculate perpendicular offset for wheel tracks
-        const dx = end.x - start.x;
-        const dy = end.y - start.y;
-        const length = Math.sqrt(dx * dx + dy * dy);
-        const perpX = -dy / length;
-        const perpY = dx / length;
-        
-        const trackStartX = start.x + perpX * offset;
-        const trackStartY = start.y + perpY * offset;
-        const trackEndX = end.x + perpX * offset;
-        const trackEndY = end.y + perpY * offset;
-        
-        // Draw intermittent wheel track marks
-        if (wheelRandom() < 0.7) {
-          ctx.beginPath();
-          ctx.moveTo(trackStartX, trackStartY);
-          ctx.lineTo(trackEndX, trackEndY);
-          ctx.stroke();
-        }
-      }
-    }
-    
-    ctx.setLineDash([]);
-  };
-
-  // Add small pebbles and stones embedded in the path
-  const drawPathPebbles = (ctx: CanvasRenderingContext2D) => {
-    const pebbleColors = ['#696969', '#808080', '#A9A9A9', '#C0C0C0', '#D3D3D3'];
-    
-    let pebbleSeed = 97531;
-    const pebbleRandom = () => {
-      pebbleSeed = (pebbleSeed * 9301 + 49297) % 233280;
-      return pebbleSeed / 233280;
+    // Use seeded random for consistent grass placement
+    let grassSeed = 13579;
+    const grassRandom = () => {
+      grassSeed = (grassSeed * 9301 + 49297) % 233280;
+      return grassSeed / 233280;
     };
     
     for (let i = 0; i < GAME_PATH.length - 1; i++) {
@@ -446,72 +333,47 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         const x = start.x + (end.x - start.x) * t;
         const y = start.y + (end.y - start.y) * t;
         
-        // Randomly place small pebbles
-        if (pebbleRandom() < 0.15) {
-          const pebbleSize = 1 + pebbleRandom() * 2;
-          const offsetX = (pebbleRandom() - 0.5) * 18;
-          const offsetY = (pebbleRandom() - 0.5) * 18;
-          const colorIndex = Math.floor(pebbleRandom() * pebbleColors.length);
-          
-          // Pebble with subtle shadow
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-          ctx.beginPath();
-          ctx.ellipse(x + offsetX + 0.5, y + offsetY + 0.5, pebbleSize * 0.8, pebbleSize * 0.6, 0, 0, Math.PI * 2);
-          ctx.fill();
-          
-          // Main pebble
-          ctx.fillStyle = pebbleColors[colorIndex];
-          ctx.globalAlpha = 0.6;
-          ctx.beginPath();
-          ctx.ellipse(x + offsetX, y + offsetY, pebbleSize, pebbleSize * 0.8, pebbleRandom() * Math.PI, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
-    }
-    ctx.globalAlpha = 1.0;
-  };
-
-  // Add worn areas and compacted sections
-  const drawPathWear = (ctx: CanvasRenderingContext2D) => {
-    let wearSeed = 86420;
-    const wearRandom = () => {
-      wearSeed = (wearSeed * 9301 + 49297) % 233280;
-      return wearSeed / 233280;
-    };
-    
-    for (let i = 0; i < GAME_PATH.length - 1; i++) {
-      const start = GAME_PATH[i];
-      const end = GAME_PATH[i + 1];
-      const distance = Math.sqrt(Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2));
-      const segments = Math.floor(distance / 20);
-      
-      for (let j = 0; j < segments; j++) {
-        const t = j / segments;
-        const x = start.x + (end.x - start.x) * t;
-        const y = start.y + (end.y - start.y) * t;
+        // Calculate perpendicular direction for grass on sides
+        const dx = end.x - start.x;
+        const dy = end.y - start.y;
+        const length = Math.sqrt(dx * dx + dy * dy);
+        const perpX = -dy / length;
+        const perpY = dx / length;
         
-        // Add worn, compacted areas
-        if (wearRandom() < 0.3) {
-          const wearSize = 8 + wearRandom() * 12;
-          const offsetX = (wearRandom() - 0.5) * 10;
-          const offsetY = (wearRandom() - 0.5) * 10;
+        // Draw static grass blades on both sides
+        for (let side = -1; side <= 1; side += 2) {
+          const grassX = x + perpX * side * (22 + grassRandom() * 6);
+          const grassY = y + perpY * side * (22 + grassRandom() * 6);
           
-          // Create worn area with darker, compacted earth
-          const wearGradient = ctx.createRadialGradient(x + offsetX, y + offsetY, 0, x + offsetX, y + offsetY, wearSize);
-          wearGradient.addColorStop(0, 'rgba(101, 67, 33, 0.4)');
-          wearGradient.addColorStop(0.6, 'rgba(139, 69, 19, 0.2)');
-          wearGradient.addColorStop(1, 'rgba(160, 82, 45, 0.1)');
-          
-          ctx.fillStyle = wearGradient;
           ctx.beginPath();
-          ctx.ellipse(x + offsetX, y + offsetY, wearSize, wearSize * 0.6, wearRandom() * Math.PI, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.moveTo(grassX, grassY);
+          ctx.lineTo(grassX + (grassRandom() - 0.5) * 3, grassY - 2 - grassRandom() * 2);
+          ctx.stroke();
         }
       }
     }
-  };
+    
+    ctx.globalAlpha = 1.0;
+  }, []);
 
+  const drawGrid = useCallback((ctx: CanvasRenderingContext2D) => {
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.lineWidth = 1;
 
+    for (let x = 0; x <= GAME_WIDTH; x += GRID_SIZE) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, GAME_HEIGHT);
+      ctx.stroke();
+    }
+
+    for (let y = 0; y <= GAME_HEIGHT; y += GRID_SIZE) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(GAME_WIDTH, y);
+      ctx.stroke();
+    }
+  }, []);
 
   const drawTowers = useCallback((ctx: CanvasRenderingContext2D) => {
     gameState.towers.forEach(tower => {
@@ -800,25 +662,20 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Safety check for game state
-    if (!gameState) return;
-
     // Draw enhanced map background
     drawEnhancedMapBackground(ctx, GAME_WIDTH, GAME_HEIGHT);
 
     // Draw game elements in proper order
+    drawGrid(ctx);
+    drawMapDecorations(ctx); // Draw decorations before path
     drawPath(ctx);
     drawTowers(ctx);
     drawEnemies(ctx);
     drawProjectiles(ctx);
     
     // Draw particles
-    if (particleSystem && typeof particleSystem === 'object' && typeof particleSystem.draw === 'function') {
-      try {
-        particleSystem.draw(ctx);
-      } catch (error) {
-        console.warn('Error drawing particles:', error);
-      }
+    if (particleSystem) {
+      particleSystem.draw(ctx);
     }
 
     // Draw placement preview
@@ -836,7 +693,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       ctx.fillText('Click to place defender', GAME_WIDTH / 2, 30);
       ctx.setLineDash([]);
     }
-  }, [gameState, drawPath, drawTowers, drawEnemies, drawProjectiles, particleSystem]);
+  }, [gameState, drawGrid, drawPath, drawTowers, drawEnemies, drawProjectiles, particleSystem]);
 
   useEffect(() => {
     draw();
@@ -924,16 +781,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         onClick={handleCanvasClick}
         className="border-2 border-accent rounded-lg cursor-pointer bg-background"
         style={{ imageRendering: 'pixelated' }}
-      />
-      
-      {/* Map Decorations Overlay */}
-      <MapDecorations />
-      
-      {/* Enhanced Effects Overlay */}
-      <EnhancedEffects
-        gameState={gameState}
-        canvasWidth={GAME_WIDTH}
-        canvasHeight={GAME_HEIGHT}
       />
       
       {/* Tower Upgrade Overlay */}
