@@ -221,9 +221,30 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   }, []);
 
   const drawPath = useCallback((ctx: CanvasRenderingContext2D) => {
-    // Draw path shadow/border first (darkest)
-    ctx.strokeStyle = '#4A4A4A';
-    ctx.lineWidth = 48;
+    // Draw path shadow first (subtle depth)
+    ctx.strokeStyle = 'rgba(139, 69, 19, 0.3)';
+    ctx.lineWidth = 46;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    
+    ctx.beginPath();
+    ctx.moveTo(GAME_PATH[0].x + 2, GAME_PATH[0].y + 2);
+    
+    for (let i = 1; i < GAME_PATH.length; i++) {
+      ctx.lineTo(GAME_PATH[i].x + 2, GAME_PATH[i].y + 2);
+    }
+    
+    ctx.stroke();
+
+    // Draw main path with Realm Defense colors
+    const pathGradient = ctx.createLinearGradient(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    pathGradient.addColorStop(0, '#F5DEB3');    // Wheat - light sandy color
+    pathGradient.addColorStop(0.3, '#DEB887');  // Burlywood - medium tone
+    pathGradient.addColorStop(0.7, '#D2B48C');  // Tan - main path color
+    pathGradient.addColorStop(1, '#BC9A6A');    // Slightly darker tan
+    
+    ctx.strokeStyle = pathGradient;
+    ctx.lineWidth = 42;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     
@@ -236,87 +257,75 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     
     ctx.stroke();
 
-    // Draw path border (darker brown)
-    ctx.strokeStyle = '#654321';
-    ctx.lineWidth = 44;
+    // Add organic edge variations (like Realm Defense)
+    ctx.strokeStyle = '#C19A6B';
+    ctx.lineWidth = 38;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
+    
+    // Use seeded random for consistent organic edges
+    let edgeSeed = 54321;
+    const edgeRandom = () => {
+      edgeSeed = (edgeSeed * 9301 + 49297) % 233280;
+      return edgeSeed / 233280;
+    };
     
     ctx.beginPath();
     ctx.moveTo(GAME_PATH[0].x, GAME_PATH[0].y);
     
     for (let i = 1; i < GAME_PATH.length; i++) {
-      ctx.lineTo(GAME_PATH[i].x, GAME_PATH[i].y);
-    }
-    
-    ctx.stroke();
-
-    // Draw main path (cobblestone base)
-    const gradient = ctx.createLinearGradient(0, 0, 900, 600);
-    gradient.addColorStop(0, '#D2B48C');
-    gradient.addColorStop(0.5, '#DEB887');
-    gradient.addColorStop(1, '#F5DEB3');
-    
-    ctx.strokeStyle = gradient;
-    ctx.lineWidth = 40;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    
-    ctx.beginPath();
-    ctx.moveTo(GAME_PATH[0].x, GAME_PATH[0].y);
-    
-    for (let i = 1; i < GAME_PATH.length; i++) {
-      ctx.lineTo(GAME_PATH[i].x, GAME_PATH[i].y);
+      // Add slight organic variation to path edges
+      const variation = (edgeRandom() - 0.5) * 3;
+      ctx.lineTo(GAME_PATH[i].x + variation, GAME_PATH[i].y + variation);
     }
     
     ctx.stroke();
     
-    // Add static cobblestone texture
-    const cobblestoneColors = ['#CD853F', '#A0522D', '#8B7355', '#D2B48C'];
+    // Add subtle dirt texture (minimal, not cluttered)
+    const dirtColors = ['#D2B48C', '#C19A6B', '#B8860B', '#CD853F'];
     
-    // Use seeded random for consistent cobblestone placement
-    let cobbleSeed = 98765;
-    const cobbleRandom = () => {
-      cobbleSeed = (cobbleSeed * 9301 + 49297) % 233280;
-      return cobbleSeed / 233280;
+    // Use seeded random for consistent dirt placement
+    let dirtSeed = 24680;
+    const dirtRandom = () => {
+      dirtSeed = (dirtSeed * 9301 + 49297) % 233280;
+      return dirtSeed / 233280;
     };
     
     for (let i = 0; i < GAME_PATH.length - 1; i++) {
       const start = GAME_PATH[i];
       const end = GAME_PATH[i + 1];
       const distance = Math.sqrt(Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2));
-      const segments = Math.floor(distance / 15);
+      const segments = Math.floor(distance / 25); // Less dense than before
       
       for (let j = 0; j < segments; j++) {
         const t = j / segments;
         const x = start.x + (end.x - start.x) * t;
         const y = start.y + (end.y - start.y) * t;
         
-        // Draw individual static cobblestones
-        const stoneSize = 3 + cobbleRandom() * 2;
-        const offsetX = (cobbleRandom() - 0.5) * 12;
-        const offsetY = (cobbleRandom() - 0.5) * 12;
-        const rotation = cobbleRandom() * Math.PI;
-        
-        const colorIndex = Math.floor(cobbleRandom() * cobblestoneColors.length);
-        ctx.fillStyle = cobblestoneColors[colorIndex];
-        ctx.strokeStyle = '#8B7355';
-        ctx.lineWidth = 0.5;
-        
-        ctx.beginPath();
-        ctx.ellipse(x + offsetX, y + offsetY, stoneSize, stoneSize * 0.8, rotation, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
+        // Draw subtle dirt patches (smaller and fewer)
+        if (dirtRandom() > 0.7) { // Only 30% chance for dirt patch
+          const patchSize = 2 + dirtRandom() * 3;
+          const offsetX = (dirtRandom() - 0.5) * 15;
+          const offsetY = (dirtRandom() - 0.5) * 15;
+          
+          const colorIndex = Math.floor(dirtRandom() * dirtColors.length);
+          ctx.fillStyle = dirtColors[colorIndex];
+          ctx.globalAlpha = 0.4;
+          
+          ctx.beginPath();
+          ctx.arc(x + offsetX, y + offsetY, patchSize, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
     }
     
-    // Add static path edge grass
-    ctx.strokeStyle = '#228B22';
-    ctx.lineWidth = 2;
-    ctx.globalAlpha = 0.4;
+    ctx.globalAlpha = 1.0;
+    
+    // Add organic grass edges (like Realm Defense)
+    const grassColors = ['#7CB342', '#689F38', '#558B2F'];
     
     // Use seeded random for consistent grass placement
-    let grassSeed = 13579;
+    let grassSeed = 97531;
     const grassRandom = () => {
       grassSeed = (grassSeed * 9301 + 49297) % 233280;
       return grassSeed / 233280;
@@ -326,7 +335,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       const start = GAME_PATH[i];
       const end = GAME_PATH[i + 1];
       const distance = Math.sqrt(Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2));
-      const segments = Math.floor(distance / 12);
+      const segments = Math.floor(distance / 20);
       
       for (let j = 0; j < segments; j++) {
         const t = j / segments;
@@ -340,15 +349,37 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         const perpX = -dy / length;
         const perpY = dx / length;
         
-        // Draw static grass blades on both sides
+        // Draw organic grass tufts on both sides (like Realm Defense)
         for (let side = -1; side <= 1; side += 2) {
-          const grassX = x + perpX * side * (22 + grassRandom() * 6);
-          const grassY = y + perpY * side * (22 + grassRandom() * 6);
-          
-          ctx.beginPath();
-          ctx.moveTo(grassX, grassY);
-          ctx.lineTo(grassX + (grassRandom() - 0.5) * 3, grassY - 2 - grassRandom() * 2);
-          ctx.stroke();
+          if (grassRandom() > 0.6) { // Only 40% chance for grass tuft
+            const grassX = x + perpX * side * (21 + grassRandom() * 4);
+            const grassY = y + perpY * side * (21 + grassRandom() * 4);
+            
+            const colorIndex = Math.floor(grassRandom() * grassColors.length);
+            ctx.fillStyle = grassColors[colorIndex];
+            ctx.globalAlpha = 0.7;
+            
+            // Draw small organic grass clump
+            const clumpSize = 2 + grassRandom() * 2;
+            ctx.beginPath();
+            ctx.arc(grassX, grassY, clumpSize, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Add a few grass blades
+            ctx.strokeStyle = grassColors[colorIndex];
+            ctx.lineWidth = 1;
+            ctx.globalAlpha = 0.5;
+            
+            for (let blade = 0; blade < 3; blade++) {
+              const bladeX = grassX + (grassRandom() - 0.5) * 4;
+              const bladeY = grassY + (grassRandom() - 0.5) * 4;
+              
+              ctx.beginPath();
+              ctx.moveTo(bladeX, bladeY);
+              ctx.lineTo(bladeX + (grassRandom() - 0.5) * 2, bladeY - 2 - grassRandom() * 3);
+              ctx.stroke();
+            }
+          }
         }
       }
     }
