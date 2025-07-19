@@ -2,7 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { GameState, Tower, Enemy, Projectile, TowerType, Position } from '../types/game';
 import { TOWER_STATS, ENEMY_STATS, WAVES, GAME_PATH, SPECIAL_ATTACKS } from '../data/gameConfig';
 import { ParticleSystem } from '../utils/particleSystem';
-import { soundManager, playPaddyLostyAudio, playMaureenAudio, playPrimeMuttonAudio, playJohnBKeaneAudio } from '../utils/soundManager';
+import { soundManager } from '../utils/soundManager';
 
 const INITIAL_STATE: GameState = {
   gold: 200,
@@ -79,28 +79,8 @@ export const useGameState = () => {
       console.log(`✅ Successfully creating ${type} tower:`, newTower);
       placementSuccess = true;
 
-      // Play character-specific audio - simple and reliable
-      try {
-        if (type === 'bartender') {
-          console.log('🗣️ Playing Paddy Losty audio...');
-          playPaddyLostyAudio();
-        } else if (type === 'bouncer') {
-          console.log('🗣️ Playing Maureen audio...');
-          playMaureenAudio();
-        } else if (type === 'fiddler') {
-          console.log('🗣️ Playing Prime Mutton audio...');
-          playPrimeMuttonAudio();
-        } else if (type === 'leprechaun') {
-          console.log('🗣️ Playing John B Keane audio...');
-          playJohnBKeaneAudio();
-        } else {
-          console.log('🗣️ Playing generic tower placement sound...');
-          soundManager.playSound('tower_place');
-        }
-      } catch (audioError) {
-        console.error('❌ Error playing tower audio:', audioError);
-        soundManager.playSound('tower_place');
-      }
+      // Play tower placement sound
+      soundManager.playSound('tower_place');
 
       return {
         ...prev,

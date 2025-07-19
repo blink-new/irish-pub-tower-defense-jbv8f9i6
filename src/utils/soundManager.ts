@@ -1,5 +1,5 @@
 // Simplified sound manager for Irish Pub Tower Defense
-// Only handles MP3 files for pub defenders and basic game sounds
+// Only handles basic game sounds and effects
 
 export class SoundManager {
   private static instance: SoundManager;
@@ -441,65 +441,5 @@ export class SoundManager {
     return this.masterVolume;
   }
 }
-
-// Simple character-specific audio functions for the 4 pub defenders
-export const playPaddyLostyAudio = () => {
-  try {
-    const audio = new Audio('/audio/paddy-losty.mp3');
-    audio.volume = 0.7;
-    console.log('🗣️ Playing Paddy Losty: "I wouldn\'t be fond of drinking"');
-    audio.play().catch(error => {
-      console.error('Error playing Paddy Losty audio:', error);
-    });
-  } catch (error) {
-    console.error('Error creating Paddy Losty audio:', error);
-  }
-};
-
-export const playMaureenAudio = () => {
-  try {
-    const audio = new Audio('/audio/maureen.mp3');
-    audio.volume = 0.7;
-    console.log('🗣️ Playing Maureen: "I have the fry on"');
-    audio.play().catch(error => {
-      console.error('Error playing Maureen audio:', error);
-      // Fallback to sound effect if audio file doesn't exist
-      soundManager.playSound('tower_place', 0.7);
-    });
-  } catch (error) {
-    console.error('Error creating Maureen audio:', error);
-    // Fallback to sound effect if audio file doesn't exist
-    soundManager.playSound('tower_place', 0.7);
-  }
-};
-
-export const playPrimeMuttonAudio = () => {
-  try {
-    const audio = new Audio('/audio/prime-mutton.mp3');
-    audio.volume = 0.7;
-    console.log('🗣️ Playing Prime Mutton: "It\'s an absolute creamer"');
-    audio.play().catch(error => {
-      console.error('Error playing Prime Mutton audio:', error);
-    });
-  } catch (error) {
-    console.error('Error creating Prime Mutton audio:', error);
-  }
-};
-
-export const playJohnBKeaneAudio = () => {
-  try {
-    const audio = new Audio('/audio/john-b-keane.mp3');
-    audio.volume = 0.7;
-    console.log('🗣️ Playing John B Keane: "Sláinte! Here\'s to good health!"');
-    audio.play().catch(error => {
-      console.error('Error playing John B Keane audio:', error);
-    });
-  } catch (error) {
-    console.error('Error creating John B Keane audio:', error);
-  }
-};
-
-// Legacy function name for backward compatibility
-export const playLuckyAudio = playJohnBKeaneAudio;
 
 export const soundManager = SoundManager.getInstance();

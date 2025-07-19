@@ -9,8 +9,7 @@ export const TOWER_STATS: Record<string, TowerStats> = {
     attackSpeed: 1.5,
     cost: 50,
     upgradeCost: 75,
-    icon: '🍺',
-    voiceLine: "I wouldn't be fond of drinking"
+    icon: '🍺'
   },
   bouncer: {
     name: 'Maureen',
@@ -20,8 +19,7 @@ export const TOWER_STATS: Record<string, TowerStats> = {
     attackSpeed: 0.8,
     cost: 100,
     upgradeCost: 150,
-    icon: '🍳',
-    voiceLine: "I have the fry on"
+    icon: '🍳'
   },
   fiddler: {
     name: 'Prime Mutton',
@@ -31,9 +29,7 @@ export const TOWER_STATS: Record<string, TowerStats> = {
     attackSpeed: 2.0,
     cost: 75,
     upgradeCost: 100,
-    icon: '🥩',
-    voiceLine: "It's an absolute creamer",
-    accent: 'english'
+    icon: '🥩'
   },
   leprechaun: {
     name: 'John B Keane',
@@ -43,8 +39,7 @@ export const TOWER_STATS: Record<string, TowerStats> = {
     attackSpeed: 1.2,
     cost: 125,
     upgradeCost: 200,
-    icon: '🥃',
-    voiceLine: "Sláinte! Here's to good health!"
+    icon: '🥃'
   }
 };
 
