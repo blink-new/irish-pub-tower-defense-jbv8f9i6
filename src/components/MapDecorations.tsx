@@ -991,250 +991,254 @@ const drawSmallDecorations = (ctx: CanvasRenderingContext2D) => {
 };
 
 const drawPubEntrance = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
-  // Main pub building - sized to fit with green space on both sides
-  const pubWidth = 110;
-  const pubHeight = 85;
+  // === REALM DEFENSE STYLE PADDY'S PUB ===
+  // Clean, simple shapes with warm colors matching the cottage aesthetic
   
-  // Pub foundation/base
-  ctx.fillStyle = '#8B7355';
-  ctx.strokeStyle = '#654321';
-  ctx.lineWidth = 3;
-  ctx.fillRect(x - pubWidth/2, y - pubHeight/2, pubWidth, pubHeight);
-  ctx.strokeRect(x - pubWidth/2, y - pubHeight/2, pubWidth, pubHeight);
+  const pubWidth = 80;
+  const pubHeight = 60;
+  const cornerRadius = 4;
+  const shadowOffset = 3;
   
-  // Stone texture on walls
-  ctx.strokeStyle = '#A0522D';
-  ctx.lineWidth = 1;
+  // === SHADOW (drawn first, behind everything) ===
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+  
+  // Main building shadow
+  ctx.beginPath();
+  ctx.roundRect(x - pubWidth/2 + shadowOffset, y - pubHeight/2 + shadowOffset, pubWidth, pubHeight, cornerRadius);
+  ctx.fill();
+  
+  // Roof shadow
+  ctx.beginPath();
+  ctx.moveTo(x - pubWidth/2 - 4 + shadowOffset, y - pubHeight/2 + shadowOffset);
+  ctx.lineTo(x + shadowOffset, y - pubHeight/2 - 20 + shadowOffset);
+  ctx.lineTo(x + pubWidth/2 + 4 + shadowOffset, y - pubHeight/2 + shadowOffset);
+  ctx.closePath();
+  ctx.fill();
+  
+  // === MAIN BUILDING WALLS (warm beige like cottages) ===
+  ctx.fillStyle = '#D2B48C'; // Same warm sandy-beige as cottages
+  ctx.beginPath();
+  ctx.roundRect(x - pubWidth/2, y - pubHeight/2, pubWidth, pubHeight, cornerRadius);
+  ctx.fill();
+  
+  // Wall outline for definition
+  ctx.strokeStyle = '#BC9A6A'; // Darker beige outline
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  
+  // === ROOF (rich brown like cottages) ===
+  ctx.fillStyle = '#8B4513'; // Same rich brown as cottage roofs
+  ctx.strokeStyle = '#654321'; // Darker brown outline
+  ctx.lineWidth = 2;
+  
+  ctx.beginPath();
+  ctx.moveTo(x - pubWidth/2 - 4, y - pubHeight/2);
+  ctx.lineTo(x, y - pubHeight/2 - 20);
+  ctx.lineTo(x + pubWidth/2 + 4, y - pubHeight/2);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  
+  // Roof highlight (where light hits)
+  ctx.fillStyle = '#A0522D'; // Lighter brown highlight
+  ctx.beginPath();
+  ctx.moveTo(x - pubWidth/2 - 4, y - pubHeight/2);
+  ctx.lineTo(x - 4, y - pubHeight/2 - 18);
+  ctx.lineTo(x, y - pubHeight/2 - 20);
+  ctx.lineTo(x - pubWidth/2 - 4, y - pubHeight/2);
+  ctx.closePath();
+  ctx.fill();
+  
+  // === CHIMNEY (simple gray like cottages) ===
+  ctx.fillStyle = '#808080'; // Medium gray
+  ctx.strokeStyle = '#696969'; // Darker gray outline
+  ctx.lineWidth = 1.5;
+  
+  ctx.beginPath();
+  ctx.roundRect(x + 12, y - pubHeight/2 - 28, 8, 16, 1);
+  ctx.fill();
+  ctx.stroke();
+  
+  // Chimney highlight
+  ctx.fillStyle = '#A9A9A9'; // Light gray highlight
+  ctx.beginPath();
+  ctx.roundRect(x + 12, y - pubHeight/2 - 28, 4, 16, 1);
+  ctx.fill();
+  
+  // === SIMPLE SMOKE (static, clean) ===
+  ctx.fillStyle = 'rgba(200, 200, 200, 0.7)';
   for (let i = 0; i < 4; i++) {
-    ctx.beginPath();
-    ctx.moveTo(x - pubWidth/2, y - pubHeight/2 + i * 15);
-    ctx.lineTo(x + pubWidth/2, y - pubHeight/2 + i * 15);
-    ctx.stroke();
-  }
-  
-  // Thatched roof - larger and more detailed
-  ctx.fillStyle = '#8B4513';
-  ctx.strokeStyle = '#654321';
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(x - pubWidth/2 - 5, y - pubHeight/2);
-  ctx.lineTo(x, y - pubHeight/2 - 25);
-  ctx.lineTo(x + pubWidth/2 + 5, y - pubHeight/2);
-  ctx.closePath();
-  ctx.fill();
-  ctx.stroke();
-  
-  // Detailed roof thatch texture
-  ctx.strokeStyle = '#CD853F';
-  ctx.lineWidth = 2;
-  for (let i = 0; i < 8; i++) {
-    ctx.beginPath();
-    ctx.moveTo(x - pubWidth/2 + i * 10, y - pubHeight/2 + 2);
-    ctx.lineTo(x - pubWidth/2 + 5 + i * 10, y - pubHeight/2 - 20);
-    ctx.stroke();
-  }
-  
-  // Main entrance door - larger and more welcoming
-  const doorWidth = 25;
-  const doorHeight = 45;
-  ctx.fillStyle = '#654321';
-  ctx.strokeStyle = '#8B4513';
-  ctx.lineWidth = 3;
-  ctx.fillRect(x - doorWidth/2, y - doorHeight/2, doorWidth, doorHeight);
-  ctx.strokeRect(x - doorWidth/2, y - doorHeight/2, doorWidth, doorHeight);
-  
-  // Door panels
-  ctx.strokeStyle = '#8B4513';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(x - doorWidth/2 + 3, y - doorHeight/2 + 5);
-  ctx.lineTo(x + doorWidth/2 - 3, y - doorHeight/2 + 5);
-  ctx.lineTo(x + doorWidth/2 - 3, y + doorHeight/2 - 5);
-  ctx.lineTo(x - doorWidth/2 + 3, y + doorHeight/2 - 5);
-  ctx.closePath();
-  ctx.stroke();
-  
-  // Door handle - brass
-  ctx.fillStyle = '#FFD700';
-  ctx.strokeStyle = '#B8860B';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.arc(x + doorWidth/2 - 5, y, 2, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.stroke();
-  
-  // Pub sign above door - "PADDY'S PUB" - made wider to contain text properly
-  const signWidth = 95; // Increased from 85 to 95
-  const signHeight = 25;
-  ctx.fillStyle = '#F5DEB3'; // Lighter background for better contrast
-  ctx.strokeStyle = '#8B4513';
-  ctx.lineWidth = 3;
-  ctx.fillRect(x - signWidth/2, y - pubHeight/2 - 20, signWidth, signHeight);
-  ctx.strokeRect(x - signWidth/2, y - pubHeight/2 - 20, signWidth, signHeight);
-  
-  // Decorative border on sign - more prominent
-  ctx.strokeStyle = '#FFD700';
-  ctx.lineWidth = 3;
-  ctx.strokeRect(x - signWidth/2 + 3, y - pubHeight/2 - 17, signWidth - 6, signHeight - 6);
-  
-  // Sign text - much larger and bolder with better contrast
-  ctx.fillStyle = '#000000'; // Black text for maximum visibility
-  ctx.font = 'bold 14px Arial, sans-serif'; // Use Arial for better readability
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText("PADDY'S PUB", x, y - pubHeight/2 - 7);
-  
-  // Add white outline to text for even better readability
-  ctx.strokeStyle = '#FFFFFF';
-  ctx.lineWidth = 1;
-  ctx.strokeText("PADDY'S PUB", x, y - pubHeight/2 - 7);
-  
-  // Decorative shamrocks on sign - moved away from text for better visibility
-  ctx.fillStyle = '#32CD32';
-  drawShamrock(ctx, x - 35, y - pubHeight/2 - 25, 0.6); // Moved up and smaller
-  drawShamrock(ctx, x + 35, y - pubHeight/2 - 25, 0.6); // Moved up and smaller
-  
-  // Windows on either side of door - larger for bigger building
-  const windowSize = 18;
-  // Left window
-  ctx.fillStyle = '#87CEEB';
-  ctx.strokeStyle = '#654321';
-  ctx.lineWidth = 2;
-  ctx.fillRect(x - 45, y - 10, windowSize, windowSize);
-  ctx.strokeRect(x - 45, y - 10, windowSize, windowSize);
-  
-  // Window cross pattern
-  ctx.beginPath();
-  ctx.moveTo(x - 45 + windowSize/2, y - 10);
-  ctx.lineTo(x - 45 + windowSize/2, y - 10 + windowSize);
-  ctx.moveTo(x - 45, y - 10 + windowSize/2);
-  ctx.lineTo(x - 45 + windowSize, y - 10 + windowSize/2);
-  ctx.stroke();
-  
-  // Right window
-  ctx.fillRect(x + 27, y - 10, windowSize, windowSize);
-  ctx.strokeRect(x + 27, y - 10, windowSize, windowSize);
-  
-  // Window cross pattern
-  ctx.beginPath();
-  ctx.moveTo(x + 27 + windowSize/2, y - 10);
-  ctx.lineTo(x + 27 + windowSize/2, y - 10 + windowSize);
-  ctx.moveTo(x + 27, y - 10 + windowSize/2);
-  ctx.lineTo(x + 27 + windowSize, y - 10 + windowSize/2);
-  ctx.stroke();
-  
-  // Chimney with smoke
-  ctx.fillStyle = '#8B4513';
-  ctx.strokeStyle = '#654321';
-  ctx.lineWidth = 2;
-  ctx.fillRect(x + 15, y - pubHeight/2 - 35, 8, 20);
-  ctx.strokeRect(x + 15, y - pubHeight/2 - 35, 8, 20);
-  
-  // Animated smoke from chimney
-  const time = Date.now() * 0.003; // 3x faster animation
-  ctx.fillStyle = 'rgba(128, 128, 128, 0.8)';
-  for (let i = 0; i < 6; i++) {
-    // Animated smoke positions with much more side-to-side movement
-    const smokeX = x + 19 + i * 2.5 + (i % 2 === 0 ? 1 : -1) * 0.8 + Math.sin(time * 0.8 + i * 0.7) * 8; // 4x wider movement
-    const smokeY = y - pubHeight/2 - 40 - i * 8 - Math.sin(time + i * 0.5) * 3;
-    const smokeSize = 3 + i * 1.2;
-    const smokeAlpha = 0.8 - i * 0.12;
-    
-    ctx.globalAlpha = smokeAlpha;
+    const smokeSize = 2.5 + i * 0.6;
+    const smokeX = x + 16 + (i % 2 === 0 ? 1 : -1) * 1.2;
+    const smokeY = y - pubHeight/2 - 30 - i * 5;
     ctx.beginPath();
     ctx.arc(smokeX, smokeY, smokeSize, 0, Math.PI * 2);
     ctx.fill();
   }
-  ctx.globalAlpha = 1.0;
   
-  // Beer barrels at entrance instead of welcome mat
-  // Left barrel
-  ctx.fillStyle = '#8B4513';
-  ctx.strokeStyle = '#654321';
-  ctx.lineWidth = 2;
+  // === MAIN DOOR (dark brown like cottages) ===
+  const doorWidth = 16;
+  const doorHeight = 28;
+  
+  ctx.fillStyle = '#654321'; // Dark brown door
+  ctx.strokeStyle = '#4A2C17'; // Very dark brown outline
+  ctx.lineWidth = 1.5;
+  
   ctx.beginPath();
-  ctx.ellipse(x - 18, y + doorHeight/2 + 8, 6, 8, 0, 0, Math.PI * 2);
+  ctx.roundRect(x - doorWidth/2, y + pubHeight/2 - doorHeight, doorWidth, doorHeight, 2);
   ctx.fill();
   ctx.stroke();
   
-  // Barrel hoops
-  ctx.strokeStyle = '#696969';
+  // Door panel (simple inset)
+  ctx.strokeStyle = '#8B4513';
   ctx.lineWidth = 1;
-  for (let i = 0; i < 3; i++) {
+  ctx.beginPath();
+  ctx.roundRect(x - doorWidth/2 + 1, y + pubHeight/2 - doorHeight + 1, doorWidth - 2, doorHeight - 2, 1);
+  ctx.stroke();
+  
+  // Door handle (simple brass dot)
+  ctx.fillStyle = '#FFD700'; // Gold handle
+  ctx.beginPath();
+  ctx.arc(x + 4, y + pubHeight/2 - doorHeight/2, 1.5, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // === WINDOWS (blue with white frames like cottages) ===
+  const windowSize = 12;
+  
+  // Left window
+  ctx.fillStyle = '#FFFFFF'; // White window frame
+  ctx.strokeStyle = '#E0E0E0'; // Light gray frame outline
+  ctx.lineWidth = 1;
+  
+  ctx.beginPath();
+  ctx.roundRect(x - 24, y - 8, windowSize, windowSize, 1);
+  ctx.fill();
+  ctx.stroke();
+  
+  // Blue window glass
+  ctx.fillStyle = '#4A90E2'; // Clean blue glass
+  ctx.beginPath();
+  ctx.roundRect(x - 23, y - 7, windowSize - 2, windowSize - 2, 1);
+  ctx.fill();
+  
+  // Window cross (simple white lines)
+  ctx.strokeStyle = '#FFFFFF';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(x - 18, y - 7);
+  ctx.lineTo(x - 18, y + 3);
+  ctx.moveTo(x - 23, y - 2);
+  ctx.lineTo(x - 13, y - 2);
+  ctx.stroke();
+  
+  // Right window
+  ctx.fillStyle = '#FFFFFF'; // White window frame
+  ctx.strokeStyle = '#E0E0E0'; // Light gray frame outline
+  ctx.lineWidth = 1;
+  
+  ctx.beginPath();
+  ctx.roundRect(x + 12, y - 8, windowSize, windowSize, 1);
+  ctx.fill();
+  ctx.stroke();
+  
+  // Blue window glass
+  ctx.fillStyle = '#4A90E2'; // Clean blue glass
+  ctx.beginPath();
+  ctx.roundRect(x + 13, y - 7, windowSize - 2, windowSize - 2, 1);
+  ctx.fill();
+  
+  // Window cross (simple white lines)
+  ctx.strokeStyle = '#FFFFFF';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(x + 18, y - 7);
+  ctx.lineTo(x + 18, y + 3);
+  ctx.moveTo(x + 13, y - 2);
+  ctx.lineTo(x + 23, y - 2);
+  ctx.stroke();
+  
+  // === PUB SIGN (clean and simple) ===
+  const signWidth = 60;
+  const signHeight = 16;
+  
+  ctx.fillStyle = '#F5DEB3'; // Light beige sign background
+  ctx.strokeStyle = '#8B4513'; // Brown outline
+  ctx.lineWidth = 2;
+  
+  ctx.beginPath();
+  ctx.roundRect(x - signWidth/2, y - pubHeight/2 - 16, signWidth, signHeight, 2);
+  ctx.fill();
+  ctx.stroke();
+  
+  // Sign border
+  ctx.strokeStyle = '#FFD700'; // Gold border
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.roundRect(x - signWidth/2 + 2, y - pubHeight/2 - 14, signWidth - 4, signHeight - 4, 1);
+  ctx.stroke();
+  
+  // Sign text (clean and readable)
+  ctx.fillStyle = '#228B22'; // Irish green text
+  ctx.font = 'bold 10px Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText("PADDY'S PUB", x, y - pubHeight/2 - 8);
+  
+  // === SUBTLE DETAILS (minimal, clean) ===
+  
+  // Wall highlight (where light hits the building)
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+  ctx.beginPath();
+  ctx.roundRect(x - pubWidth/2, y - pubHeight/2, pubWidth/3, pubHeight, cornerRadius);
+  ctx.fill();
+  
+  // Small decorative shamrocks on sign (very subtle)
+  ctx.fillStyle = '#32CD32';
+  ctx.globalAlpha = 0.7;
+  ctx.beginPath();
+  ctx.arc(x - 22, y - pubHeight/2 - 8, 2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(x + 22, y - pubHeight/2 - 8, 2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.globalAlpha = 1.0;
+  
+  // Simple beer barrels at entrance (clean design)
+  // Left barrel
+  ctx.fillStyle = '#8B4513'; // Brown barrel
+  ctx.strokeStyle = '#654321'; // Dark brown outline
+  ctx.lineWidth = 1.5;
+  
+  ctx.beginPath();
+  ctx.ellipse(x - 12, y + pubHeight/2 + 6, 4, 6, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  
+  // Barrel hoops (simple)
+  ctx.strokeStyle = '#696969'; // Gray hoops
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 2; i++) {
     ctx.beginPath();
-    ctx.ellipse(x - 18, y + doorHeight/2 + 4 + i * 3, 6, 1, 0, 0, Math.PI * 2);
+    ctx.ellipse(x - 12, y + pubHeight/2 + 3 + i * 4, 4, 0.8, 0, 0, Math.PI * 2);
     ctx.stroke();
   }
   
   // Right barrel
-  ctx.fillStyle = '#8B4513';
-  ctx.strokeStyle = '#654321';
-  ctx.lineWidth = 2;
+  ctx.fillStyle = '#8B4513'; // Brown barrel
+  ctx.strokeStyle = '#654321'; // Dark brown outline
+  ctx.lineWidth = 1.5;
+  
   ctx.beginPath();
-  ctx.ellipse(x + 18, y + doorHeight/2 + 8, 6, 8, 0, 0, Math.PI * 2);
+  ctx.ellipse(x + 12, y + pubHeight/2 + 6, 4, 6, 0, 0, Math.PI * 2);
   ctx.fill();
   ctx.stroke();
   
-  // Barrel hoops
-  ctx.strokeStyle = '#696969';
+  // Barrel hoops (simple)
+  ctx.strokeStyle = '#696969'; // Gray hoops
   ctx.lineWidth = 1;
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 2; i++) {
     ctx.beginPath();
-    ctx.ellipse(x + 18, y + doorHeight/2 + 4 + i * 3, 6, 1, 0, 0, Math.PI * 2);
+    ctx.ellipse(x + 12, y + pubHeight/2 + 3 + i * 4, 4, 0.8, 0, 0, Math.PI * 2);
     ctx.stroke();
   }
-  
-  // Lanterns on either side of entrance - positioned for larger building
-  // Left lantern
-  ctx.fillStyle = '#8B4513';
-  ctx.strokeStyle = '#654321';
-  ctx.lineWidth = 2;
-  ctx.fillRect(x - 55, y - 15, 5, 18);
-  ctx.strokeRect(x - 55, y - 15, 5, 18);
-  
-  // Lantern light
-  ctx.fillStyle = '#FFD700';
-  ctx.strokeStyle = '#B8860B';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.arc(x - 52, y - 20, 5, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.stroke();
-  
-  // Right lantern
-  ctx.fillStyle = '#8B4513';
-  ctx.strokeStyle = '#654321';
-  ctx.lineWidth = 2;
-  ctx.fillRect(x + 50, y - 15, 5, 18);
-  ctx.strokeRect(x + 50, y - 15, 5, 18);
-  
-  // Lantern light
-  ctx.fillStyle = '#FFD700';
-  ctx.strokeStyle = '#B8860B';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.arc(x + 52, y - 20, 5, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.stroke();
-  
-  // Add some ivy or vines on the walls
-  ctx.strokeStyle = '#228B22';
-  ctx.lineWidth = 2;
-  ctx.globalAlpha = 0.7;
-  
-  // Left side ivy
-  ctx.beginPath();
-  ctx.moveTo(x - pubWidth/2, y + pubHeight/2);
-  ctx.quadraticCurveTo(x - pubWidth/2 + 10, y + pubHeight/2 - 20, x - pubWidth/2 + 5, y + pubHeight/2 - 40);
-  ctx.stroke();
-  
-  // Right side ivy
-  ctx.beginPath();
-  ctx.moveTo(x + pubWidth/2, y + pubHeight/2);
-  ctx.quadraticCurveTo(x + pubWidth/2 - 10, y + pubHeight/2 - 20, x + pubWidth/2 - 5, y + pubHeight/2 - 40);
-  ctx.stroke();
-  
-  ctx.globalAlpha = 1.0;
-  
-
 };
