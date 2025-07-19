@@ -1103,7 +1103,8 @@ const drawPubEntrance = (ctx: CanvasRenderingContext2D, x: number, y: number) =>
   ctx.fill();
   
   // === WINDOWS (blue with white frames like cottages) ===
-  const windowSize = 12;
+  const windowWidth = 14;
+  const windowHeight = 10; // More rectangular, wider than tall
   
   // Left window
   ctx.fillStyle = '#FFFFFF'; // White window frame
@@ -1111,24 +1112,24 @@ const drawPubEntrance = (ctx: CanvasRenderingContext2D, x: number, y: number) =>
   ctx.lineWidth = 1;
   
   ctx.beginPath();
-  ctx.roundRect(x - 24, y - 8, windowSize, windowSize, 1);
+  ctx.roundRect(x - 26, y - 8, windowWidth, windowHeight, 1);
   ctx.fill();
   ctx.stroke();
   
   // Blue window glass
   ctx.fillStyle = '#4A90E2'; // Clean blue glass
   ctx.beginPath();
-  ctx.roundRect(x - 23, y - 7, windowSize - 2, windowSize - 2, 1);
+  ctx.roundRect(x - 25, y - 7, windowWidth - 2, windowHeight - 2, 1);
   ctx.fill();
   
   // Window cross (simple white lines)
   ctx.strokeStyle = '#FFFFFF';
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(x - 18, y - 7);
-  ctx.lineTo(x - 18, y + 3);
-  ctx.moveTo(x - 23, y - 2);
-  ctx.lineTo(x - 13, y - 2);
+  ctx.moveTo(x - 19, y - 7);
+  ctx.lineTo(x - 19, y + 1);
+  ctx.moveTo(x - 25, y - 3);
+  ctx.lineTo(x - 13, y - 3);
   ctx.stroke();
   
   // Right window
@@ -1137,49 +1138,49 @@ const drawPubEntrance = (ctx: CanvasRenderingContext2D, x: number, y: number) =>
   ctx.lineWidth = 1;
   
   ctx.beginPath();
-  ctx.roundRect(x + 12, y - 8, windowSize, windowSize, 1);
+  ctx.roundRect(x + 12, y - 8, windowWidth, windowHeight, 1);
   ctx.fill();
   ctx.stroke();
   
   // Blue window glass
   ctx.fillStyle = '#4A90E2'; // Clean blue glass
   ctx.beginPath();
-  ctx.roundRect(x + 13, y - 7, windowSize - 2, windowSize - 2, 1);
+  ctx.roundRect(x + 13, y - 7, windowWidth - 2, windowHeight - 2, 1);
   ctx.fill();
   
   // Window cross (simple white lines)
   ctx.strokeStyle = '#FFFFFF';
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(x + 18, y - 7);
-  ctx.lineTo(x + 18, y + 3);
-  ctx.moveTo(x + 13, y - 2);
-  ctx.lineTo(x + 23, y - 2);
+  ctx.moveTo(x + 19, y - 7);
+  ctx.lineTo(x + 19, y + 1);
+  ctx.moveTo(x + 13, y - 3);
+  ctx.lineTo(x + 25, y - 3);
   ctx.stroke();
   
-  // === PUB SIGN (clean and simple) ===
-  const signWidth = 60;
-  const signHeight = 16;
+  // === PUB SIGN (larger and more readable) ===
+  const signWidth = 70;
+  const signHeight = 20;
   
-  ctx.fillStyle = '#F5DEB3'; // Light beige sign background
-  ctx.strokeStyle = '#8B4513'; // Brown outline
+  ctx.fillStyle = '#2F4F2F'; // Dark green pub sign background
+  ctx.strokeStyle = '#FFD700'; // Gold outline
   ctx.lineWidth = 2;
   
   ctx.beginPath();
-  ctx.roundRect(x - signWidth/2, y - pubHeight/2 - 16, signWidth, signHeight, 2);
+  ctx.roundRect(x - signWidth/2, y - pubHeight/2 - 18, signWidth, signHeight, 3);
   ctx.fill();
   ctx.stroke();
   
-  // Sign border
+  // Sign border (decorative)
   ctx.strokeStyle = '#FFD700'; // Gold border
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.roundRect(x - signWidth/2 + 2, y - pubHeight/2 - 14, signWidth - 4, signHeight - 4, 1);
+  ctx.roundRect(x - signWidth/2 + 3, y - pubHeight/2 - 15, signWidth - 6, signHeight - 6, 2);
   ctx.stroke();
   
-  // Sign text (clean and readable)
-  ctx.fillStyle = '#228B22'; // Irish green text
-  ctx.font = 'bold 10px Arial, sans-serif';
+  // Sign text (larger and more readable)
+  ctx.fillStyle = '#FFD700'; // Gold text for contrast
+  ctx.font = 'bold 12px Arial, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText("PADDY'S PUB", x, y - pubHeight/2 - 8);
@@ -1192,53 +1193,145 @@ const drawPubEntrance = (ctx: CanvasRenderingContext2D, x: number, y: number) =>
   ctx.roundRect(x - pubWidth/2, y - pubHeight/2, pubWidth/3, pubHeight, cornerRadius);
   ctx.fill();
   
-  // Small decorative shamrocks on sign (very subtle)
+  // Decorative shamrocks on sign
   ctx.fillStyle = '#32CD32';
-  ctx.globalAlpha = 0.7;
+  ctx.globalAlpha = 0.8;
   ctx.beginPath();
-  ctx.arc(x - 22, y - pubHeight/2 - 8, 2, 0, Math.PI * 2);
+  ctx.arc(x - 28, y - pubHeight/2 - 8, 2.5, 0, Math.PI * 2);
   ctx.fill();
   ctx.beginPath();
-  ctx.arc(x + 22, y - pubHeight/2 - 8, 2, 0, Math.PI * 2);
+  ctx.arc(x + 28, y - pubHeight/2 - 8, 2.5, 0, Math.PI * 2);
   ctx.fill();
   ctx.globalAlpha = 1.0;
   
-  // Simple beer barrels at entrance (clean design)
-  // Left barrel
+  // === PUB LANTERNS (hanging from roof) ===
+  // Left lantern
+  ctx.fillStyle = '#8B4513'; // Brown lantern frame
+  ctx.strokeStyle = '#654321';
+  ctx.lineWidth = 1;
+  
+  ctx.beginPath();
+  ctx.roundRect(x - 32, y - pubHeight/2 + 8, 6, 10, 1);
+  ctx.fill();
+  ctx.stroke();
+  
+  // Lantern glass (warm glow)
+  ctx.fillStyle = '#FFD700';
+  ctx.globalAlpha = 0.7;
+  ctx.beginPath();
+  ctx.roundRect(x - 31, y - pubHeight/2 + 9, 4, 8, 1);
+  ctx.fill();
+  ctx.globalAlpha = 1.0;
+  
+  // Lantern chain
+  ctx.strokeStyle = '#696969';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(x - 29, y - pubHeight/2 + 8);
+  ctx.lineTo(x - 29, y - pubHeight/2 + 2);
+  ctx.stroke();
+  
+  // Right lantern
+  ctx.fillStyle = '#8B4513'; // Brown lantern frame
+  ctx.strokeStyle = '#654321';
+  ctx.lineWidth = 1;
+  
+  ctx.beginPath();
+  ctx.roundRect(x + 26, y - pubHeight/2 + 8, 6, 10, 1);
+  ctx.fill();
+  ctx.stroke();
+  
+  // Lantern glass (warm glow)
+  ctx.fillStyle = '#FFD700';
+  ctx.globalAlpha = 0.7;
+  ctx.beginPath();
+  ctx.roundRect(x + 27, y - pubHeight/2 + 9, 4, 8, 1);
+  ctx.fill();
+  ctx.globalAlpha = 1.0;
+  
+  // Lantern chain
+  ctx.strokeStyle = '#696969';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(x + 29, y - pubHeight/2 + 8);
+  ctx.lineTo(x + 29, y - pubHeight/2 + 2);
+  ctx.stroke();
+  
+  // Enhanced beer barrels at entrance (more prominent and pub-like)
+  // Left barrel (larger and more detailed)
   ctx.fillStyle = '#8B4513'; // Brown barrel
   ctx.strokeStyle = '#654321'; // Dark brown outline
   ctx.lineWidth = 1.5;
   
   ctx.beginPath();
-  ctx.ellipse(x - 12, y + pubHeight/2 + 6, 4, 6, 0, 0, Math.PI * 2);
+  ctx.ellipse(x - 15, y + pubHeight/2 + 8, 6, 8, 0, 0, Math.PI * 2);
   ctx.fill();
   ctx.stroke();
   
-  // Barrel hoops (simple)
-  ctx.strokeStyle = '#696969'; // Gray hoops
-  ctx.lineWidth = 1;
-  for (let i = 0; i < 2; i++) {
+  // Barrel highlight (where light hits)
+  ctx.fillStyle = '#A0522D';
+  ctx.beginPath();
+  ctx.ellipse(x - 17, y + pubHeight/2 + 6, 3, 6, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Barrel hoops (more prominent)
+  ctx.strokeStyle = '#C0C0C0'; // Silver hoops
+  ctx.lineWidth = 1.5;
+  for (let i = 0; i < 3; i++) {
     ctx.beginPath();
-    ctx.ellipse(x - 12, y + pubHeight/2 + 3 + i * 4, 4, 0.8, 0, 0, Math.PI * 2);
+    ctx.ellipse(x - 15, y + pubHeight/2 + 3 + i * 4, 6, 1, 0, 0, Math.PI * 2);
     ctx.stroke();
   }
   
-  // Right barrel
+  // Barrel tap/spigot
+  ctx.fillStyle = '#FFD700'; // Gold tap
+  ctx.beginPath();
+  ctx.roundRect(x - 9, y + pubHeight/2 + 8, 3, 1.5, 0.5);
+  ctx.fill();
+  
+  // Right barrel (larger and more detailed)
   ctx.fillStyle = '#8B4513'; // Brown barrel
   ctx.strokeStyle = '#654321'; // Dark brown outline
   ctx.lineWidth = 1.5;
   
   ctx.beginPath();
-  ctx.ellipse(x + 12, y + pubHeight/2 + 6, 4, 6, 0, 0, Math.PI * 2);
+  ctx.ellipse(x + 15, y + pubHeight/2 + 8, 6, 8, 0, 0, Math.PI * 2);
   ctx.fill();
   ctx.stroke();
   
-  // Barrel hoops (simple)
-  ctx.strokeStyle = '#696969'; // Gray hoops
-  ctx.lineWidth = 1;
-  for (let i = 0; i < 2; i++) {
+  // Barrel highlight (where light hits)
+  ctx.fillStyle = '#A0522D';
+  ctx.beginPath();
+  ctx.ellipse(x + 13, y + pubHeight/2 + 6, 3, 6, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Barrel hoops (more prominent)
+  ctx.strokeStyle = '#C0C0C0'; // Silver hoops
+  ctx.lineWidth = 1.5;
+  for (let i = 0; i < 3; i++) {
     ctx.beginPath();
-    ctx.ellipse(x + 12, y + pubHeight/2 + 3 + i * 4, 4, 0.8, 0, 0, Math.PI * 2);
+    ctx.ellipse(x + 15, y + pubHeight/2 + 3 + i * 4, 6, 1, 0, 0, Math.PI * 2);
     ctx.stroke();
   }
+  
+  // Barrel tap/spigot
+  ctx.fillStyle = '#FFD700'; // Gold tap
+  ctx.beginPath();
+  ctx.roundRect(x + 21, y + pubHeight/2 + 8, 3, 1.5, 0.5);
+  ctx.fill();
+  
+  // === ADDITIONAL PUB DETAILS ===
+  // Small pub bench/stool near entrance
+  ctx.fillStyle = '#8B4513'; // Brown wood
+  ctx.strokeStyle = '#654321';
+  ctx.lineWidth = 1;
+  
+  ctx.beginPath();
+  ctx.roundRect(x - 6, y + pubHeight/2 + 12, 12, 3, 1);
+  ctx.fill();
+  ctx.stroke();
+  
+  // Bench legs
+  ctx.fillRect(x - 4, y + pubHeight/2 + 15, 2, 4);
+  ctx.fillRect(x + 2, y + pubHeight/2 + 15, 2, 4);
 };
