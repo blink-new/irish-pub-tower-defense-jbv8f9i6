@@ -142,47 +142,160 @@ const drawGrassTexture = (ctx: CanvasRenderingContext2D) => {
 };
 
 const drawEnhancedTree = (ctx: CanvasRenderingContext2D, x: number, y: number, scale: number = 1.0) => {
-  const size = 12 * scale;
+  // Realm Defense style chunky tree with puffy foliage clusters
+  const baseSize = 14 * scale;
+  const trunkWidth = 5 * scale;
+  const trunkHeight = 22 * scale;
   
-  // Tree trunk with texture
-  ctx.fillStyle = '#8B4513';
-  ctx.fillRect(x - 3 * scale, y, 6 * scale, 20 * scale);
+  // === TRUNK - Thick and textured like Realm Defense ===
+  // Main trunk with gradient for depth
+  const trunkGradient = ctx.createLinearGradient(x - trunkWidth/2, y, x + trunkWidth/2, y);
+  trunkGradient.addColorStop(0, '#8B4513'); // Dark brown shadow side
+  trunkGradient.addColorStop(0.3, '#A0522D'); // Medium brown
+  trunkGradient.addColorStop(0.7, '#CD853F'); // Light brown highlight side
+  trunkGradient.addColorStop(1, '#8B4513'); // Dark brown edge
   
-  // Add bark texture
+  ctx.fillStyle = trunkGradient;
+  ctx.fillRect(x - trunkWidth/2, y, trunkWidth, trunkHeight);
+  
+  // Trunk outline for definition
   ctx.strokeStyle = '#654321';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(x - trunkWidth/2, y, trunkWidth, trunkHeight);
+  
+  // Bark texture - vertical lines
+  ctx.strokeStyle = '#5D4037';
   ctx.lineWidth = 1;
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 4; i++) {
+    const lineX = x - trunkWidth/2 + 1 + i * (trunkWidth - 2) / 3;
     ctx.beginPath();
-    ctx.moveTo(x - 2 * scale, y + 5 * i * scale);
-    ctx.lineTo(x + 2 * scale, y + 5 * i * scale);
+    ctx.moveTo(lineX, y + 2);
+    ctx.lineTo(lineX, y + trunkHeight - 2);
     ctx.stroke();
   }
   
-  // Multiple layers of foliage for depth
-  ctx.fillStyle = '#006400'; // Dark green base
+  // === FOLIAGE - Multiple chunky, puffy clusters ===
+  
+  // Shadow base for all foliage (drawn first, behind everything)
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+  const shadowOffset = 2 * scale;
+  
+  // Main center cluster shadow
   ctx.beginPath();
-  ctx.arc(x, y - 5 * scale, size, 0, Math.PI * 2);
+  ctx.arc(x + shadowOffset, y - 2 * scale + shadowOffset, baseSize, 0, Math.PI * 2);
   ctx.fill();
   
-  ctx.fillStyle = '#228B22'; // Medium green
+  // Side clusters shadows
   ctx.beginPath();
-  ctx.arc(x - 4 * scale, y - 8 * scale, size * 0.7, 0, Math.PI * 2);
-  ctx.fill();
-  
-  ctx.beginPath();
-  ctx.arc(x + 4 * scale, y - 8 * scale, size * 0.7, 0, Math.PI * 2);
-  ctx.fill();
-  
-  ctx.fillStyle = '#32CD32'; // Light green highlights
-  ctx.beginPath();
-  ctx.arc(x - 6 * scale, y - 6 * scale, size * 0.5, 0, Math.PI * 2);
+  ctx.arc(x - 8 * scale + shadowOffset, y - 8 * scale + shadowOffset, baseSize * 0.8, 0, Math.PI * 2);
   ctx.fill();
   
   ctx.beginPath();
-  ctx.arc(x + 6 * scale, y - 6 * scale, size * 0.5, 0, Math.PI * 2);
+  ctx.arc(x + 8 * scale + shadowOffset, y - 8 * scale + shadowOffset, baseSize * 0.8, 0, Math.PI * 2);
   ctx.fill();
   
-  // Add some berries or fruits - using seeded random for consistency
+  // Top cluster shadow
+  ctx.beginPath();
+  ctx.arc(x + shadowOffset, y - 15 * scale + shadowOffset, baseSize * 0.7, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // === MAIN FOLIAGE CLUSTERS ===
+  
+  // 1. Main center cluster (largest, darkest base)
+  ctx.fillStyle = '#2E7D32'; // Dark forest green base
+  ctx.beginPath();
+  ctx.arc(x, y - 2 * scale, baseSize, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // 2. Left side cluster
+  ctx.fillStyle = '#388E3C'; // Medium green
+  ctx.beginPath();
+  ctx.arc(x - 8 * scale, y - 8 * scale, baseSize * 0.8, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // 3. Right side cluster
+  ctx.fillStyle = '#388E3C'; // Medium green
+  ctx.beginPath();
+  ctx.arc(x + 8 * scale, y - 8 * scale, baseSize * 0.8, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // 4. Top center cluster
+  ctx.fillStyle = '#43A047'; // Lighter green (gets more light)
+  ctx.beginPath();
+  ctx.arc(x, y - 15 * scale, baseSize * 0.7, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // === HIGHLIGHT LAYERS (soft edge highlights) ===
+  
+  // Main cluster highlight (top-left where light hits)
+  ctx.fillStyle = '#66BB6A'; // Bright green highlight
+  ctx.beginPath();
+  ctx.arc(x - 3 * scale, y - 5 * scale, baseSize * 0.6, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Left cluster highlight
+  ctx.fillStyle = '#66BB6A';
+  ctx.beginPath();
+  ctx.arc(x - 10 * scale, y - 11 * scale, baseSize * 0.5, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Right cluster highlight
+  ctx.fillStyle = '#66BB6A';
+  ctx.beginPath();
+  ctx.arc(x + 6 * scale, y - 11 * scale, baseSize * 0.5, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Top cluster highlight
+  ctx.fillStyle = '#81C784'; // Brightest highlight (most light)
+  ctx.beginPath();
+  ctx.arc(x - 2 * scale, y - 18 * scale, baseSize * 0.4, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // === SMALL ACCENT CLUSTERS ===
+  
+  // Small clusters to fill gaps and add organic feel
+  ctx.fillStyle = '#4CAF50';
+  
+  // Bottom left small cluster
+  ctx.beginPath();
+  ctx.arc(x - 12 * scale, y - 3 * scale, baseSize * 0.4, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Bottom right small cluster
+  ctx.beginPath();
+  ctx.arc(x + 12 * scale, y - 3 * scale, baseSize * 0.4, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Top left small cluster
+  ctx.beginPath();
+  ctx.arc(x - 5 * scale, y - 20 * scale, baseSize * 0.3, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Top right small cluster
+  ctx.beginPath();
+  ctx.arc(x + 5 * scale, y - 20 * scale, baseSize * 0.3, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // === FINAL BRIGHT HIGHLIGHTS (very small, very bright) ===
+  
+  ctx.fillStyle = '#A5D6A7'; // Very bright highlight
+  
+  // Tiny bright spots where light hits most
+  ctx.beginPath();
+  ctx.arc(x - 4 * scale, y - 7 * scale, baseSize * 0.2, 0, Math.PI * 2);
+  ctx.fill();
+  
+  ctx.beginPath();
+  ctx.arc(x - 1 * scale, y - 19 * scale, baseSize * 0.15, 0, Math.PI * 2);
+  ctx.fill();
+  
+  ctx.beginPath();
+  ctx.arc(x + 7 * scale, y - 12 * scale, baseSize * 0.18, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // === OPTIONAL DETAILS ===
+  
+  // Add some small berries or fruits occasionally - using seeded random for consistency
   const seed = x + y * 1000;
   let random = seed;
   const seededRandom = () => {
@@ -190,14 +303,21 @@ const drawEnhancedTree = (ctx: CanvasRenderingContext2D, x: number, y: number, s
     return random / 233280;
   };
   
-  if (seededRandom() > 0.7) {
-    ctx.fillStyle = '#DC143C';
-    for (let i = 0; i < 3; i++) {
-      const berryX = x + (seededRandom() - 0.5) * size;
-      const berryY = y - 5 * scale + (seededRandom() - 0.5) * size;
+  if (seededRandom() > 0.6) {
+    ctx.fillStyle = '#E57373'; // Soft red berries
+    for (let i = 0; i < 4; i++) {
+      const berryX = x + (seededRandom() - 0.5) * baseSize * 1.5;
+      const berryY = y - 8 * scale + (seededRandom() - 0.5) * baseSize;
       ctx.beginPath();
-      ctx.arc(berryX, berryY, 1.5, 0, Math.PI * 2);
+      ctx.arc(berryX, berryY, 1.5 * scale, 0, Math.PI * 2);
       ctx.fill();
+      
+      // Berry highlight
+      ctx.fillStyle = '#FFCDD2';
+      ctx.beginPath();
+      ctx.arc(berryX - 0.5 * scale, berryY - 0.5 * scale, 0.8 * scale, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#E57373'; // Reset for next berry
     }
   }
 };
