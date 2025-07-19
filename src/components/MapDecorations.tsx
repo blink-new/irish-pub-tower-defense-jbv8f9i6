@@ -534,97 +534,188 @@ const drawEnhancedRock = (ctx: CanvasRenderingContext2D, x: number, y: number, s
 };
 
 const drawIrishCottage = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
-  // Cottage base with stone texture
-  ctx.fillStyle = '#DEB887';
-  ctx.strokeStyle = '#8B7355';
-  ctx.lineWidth = 2;
-  ctx.fillRect(x - 15, y, 30, 20);
-  ctx.strokeRect(x - 15, y, 30, 20);
+  // === REALM DEFENSE STYLE COTTAGE ===
+  // Inspired by the reference image with clean, simple shapes and warm colors
   
-  // Add stone texture
-  ctx.strokeStyle = '#A0522D';
-  ctx.lineWidth = 1;
-  for (let i = 0; i < 3; i++) {
-    ctx.beginPath();
-    ctx.moveTo(x - 15, y + 7 * i);
-    ctx.lineTo(x + 15, y + 7 * i);
-    ctx.stroke();
-  }
+  const cottageWidth = 32;
+  const cottageHeight = 22;
+  const cornerRadius = 3;
   
-  // Thatched roof with texture
-  ctx.fillStyle = '#8B4513';
-  ctx.strokeStyle = '#654321';
-  ctx.lineWidth = 2;
+  // === SHADOW (drawn first, behind everything) ===
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+  const shadowOffset = 2;
+  
+  // Cottage shadow
   ctx.beginPath();
-  ctx.moveTo(x - 18, y);
-  ctx.lineTo(x, y - 15);
-  ctx.lineTo(x + 18, y);
+  ctx.roundRect(x - cottageWidth/2 + shadowOffset, y + shadowOffset, cottageWidth, cottageHeight, cornerRadius);
+  ctx.fill();
+  
+  // Roof shadow
+  ctx.beginPath();
+  ctx.moveTo(x - cottageWidth/2 - 2 + shadowOffset, y + shadowOffset);
+  ctx.lineTo(x + shadowOffset, y - 16 + shadowOffset);
+  ctx.lineTo(x + cottageWidth/2 + 2 + shadowOffset, y + shadowOffset);
+  ctx.closePath();
+  ctx.fill();
+  
+  // === COTTAGE WALLS (warm beige like Realm Defense) ===
+  ctx.fillStyle = '#D2B48C'; // Warm sandy beige from reference
+  ctx.beginPath();
+  ctx.roundRect(x - cottageWidth/2, y, cottageWidth, cottageHeight, cornerRadius);
+  ctx.fill();
+  
+  // Wall outline for definition
+  ctx.strokeStyle = '#BC9A6A'; // Darker beige outline
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  
+  // === ROOF (rich brown like Realm Defense) ===
+  ctx.fillStyle = '#8B4513'; // Rich brown roof
+  ctx.strokeStyle = '#654321'; // Darker brown outline
+  ctx.lineWidth = 2;
+  
+  ctx.beginPath();
+  ctx.moveTo(x - cottageWidth/2 - 2, y);
+  ctx.lineTo(x, y - 16);
+  ctx.lineTo(x + cottageWidth/2 + 2, y);
   ctx.closePath();
   ctx.fill();
   ctx.stroke();
   
-  // Roof thatch texture
-  ctx.strokeStyle = '#CD853F';
-  ctx.lineWidth = 1;
-  for (let i = 0; i < 5; i++) {
-    ctx.beginPath();
-    ctx.moveTo(x - 15 + i * 6, y - 2);
-    ctx.lineTo(x - 12 + i * 6, y - 12);
-    ctx.stroke();
-  }
+  // Roof highlight (where light hits)
+  ctx.fillStyle = '#A0522D'; // Lighter brown highlight
+  ctx.beginPath();
+  ctx.moveTo(x - cottageWidth/2 - 2, y);
+  ctx.lineTo(x - 2, y - 14);
+  ctx.lineTo(x, y - 16);
+  ctx.lineTo(x - cottageWidth/2 - 2, y);
+  ctx.closePath();
+  ctx.fill();
   
-  // Chimney with smoke
-  ctx.fillStyle = '#8B4513';
-  ctx.fillRect(x + 8, y - 18, 6, 12);
-  ctx.strokeRect(x + 8, y - 18, 6, 12);
+  // === CHIMNEY (simple gray like Realm Defense) ===
+  ctx.fillStyle = '#808080'; // Medium gray
+  ctx.strokeStyle = '#696969'; // Darker gray outline
+  ctx.lineWidth = 1.5;
   
-  // Enhanced static smoke (no animation to avoid green ball clusters)
-  ctx.fillStyle = 'rgba(128, 128, 128, 0.7)';
-  for (let i = 0; i < 4; i++) {
-    const smokeSize = 2.5 + i * 1.2;
-    const smokeX = x + 11 + i * 2.2 + (i % 2 === 0 ? 1 : -1) * 0.8;
-    const smokeY = y - 20 - i * 4;
+  ctx.beginPath();
+  ctx.roundRect(x + 8, y - 20, 6, 14, 1);
+  ctx.fill();
+  ctx.stroke();
+  
+  // Chimney highlight
+  ctx.fillStyle = '#A9A9A9'; // Light gray highlight
+  ctx.beginPath();
+  ctx.roundRect(x + 8, y - 20, 3, 14, 1);
+  ctx.fill();
+  
+  // === SIMPLE SMOKE (static, clean) ===
+  ctx.fillStyle = 'rgba(200, 200, 200, 0.6)';
+  for (let i = 0; i < 3; i++) {
+    const smokeSize = 2 + i * 0.8;
+    const smokeX = x + 11 + (i % 2 === 0 ? 1 : -1) * 1.5;
+    const smokeY = y - 22 - i * 4;
     ctx.beginPath();
     ctx.arc(smokeX, smokeY, smokeSize, 0, Math.PI * 2);
     ctx.fill();
   }
   
-  // Door with Celtic design
-  ctx.fillStyle = '#654321';
-  ctx.fillRect(x - 5, y + 8, 8, 12);
-  ctx.strokeStyle = '#8B4513';
-  ctx.strokeRect(x - 5, y + 8, 8, 12);
+  // === DOOR (dark brown like Realm Defense) ===
+  const doorWidth = 8;
+  const doorHeight = 14;
   
-  // Celtic knot on door
-  ctx.strokeStyle = '#FFD700';
-  ctx.lineWidth = 2;
+  ctx.fillStyle = '#654321'; // Dark brown door
+  ctx.strokeStyle = '#4A2C17'; // Very dark brown outline
+  ctx.lineWidth = 1.5;
+  
   ctx.beginPath();
-  ctx.arc(x - 1, y + 14, 2, 0, Math.PI * 2);
+  ctx.roundRect(x - doorWidth/2, y + cottageHeight - doorHeight, doorWidth, doorHeight, 1);
+  ctx.fill();
   ctx.stroke();
   
-  // Door handle
-  ctx.fillStyle = '#FFD700';
-  ctx.beginPath();
-  ctx.arc(x + 1, y + 14, 1, 0, Math.PI * 2);
-  ctx.fill();
-  
-  // Window with diamond pattern
-  ctx.fillStyle = '#87CEEB';
-  ctx.strokeStyle = '#654321';
-  ctx.lineWidth = 2;
-  ctx.fillRect(x + 6, y + 6, 8, 8);
-  ctx.strokeRect(x + 6, y + 6, 8, 8);
-  
-  // Diamond window pattern
-  ctx.strokeStyle = '#654321';
+  // Door panel (simple inset)
+  ctx.strokeStyle = '#8B4513';
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(x + 10, y + 6);
-  ctx.lineTo(x + 14, y + 10);
-  ctx.lineTo(x + 10, y + 14);
-  ctx.lineTo(x + 6, y + 10);
-  ctx.closePath();
+  ctx.roundRect(x - doorWidth/2 + 1, y + cottageHeight - doorHeight + 1, doorWidth - 2, doorHeight - 2, 1);
   ctx.stroke();
+  
+  // Door handle (simple brass dot)
+  ctx.fillStyle = '#FFD700'; // Gold handle
+  ctx.beginPath();
+  ctx.arc(x + 2, y + cottageHeight - doorHeight/2, 1.5, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // === WINDOWS (blue with white frames like Realm Defense) ===
+  const windowSize = 8;
+  
+  // Left window
+  ctx.fillStyle = '#FFFFFF'; // White window frame
+  ctx.strokeStyle = '#E0E0E0'; // Light gray frame outline
+  ctx.lineWidth = 1;
+  
+  ctx.beginPath();
+  ctx.roundRect(x - 12, y + 6, windowSize, windowSize, 1);
+  ctx.fill();
+  ctx.stroke();
+  
+  // Blue window glass
+  ctx.fillStyle = '#4A90E2'; // Clean blue glass
+  ctx.beginPath();
+  ctx.roundRect(x - 11, y + 7, windowSize - 2, windowSize - 2, 1);
+  ctx.fill();
+  
+  // Window cross (simple white lines)
+  ctx.strokeStyle = '#FFFFFF';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(x - 8, y + 7);
+  ctx.lineTo(x - 8, y + 13);
+  ctx.moveTo(x - 11, y + 10);
+  ctx.lineTo(x - 5, y + 10);
+  ctx.stroke();
+  
+  // Right window
+  ctx.fillStyle = '#FFFFFF'; // White window frame
+  ctx.strokeStyle = '#E0E0E0'; // Light gray frame outline
+  ctx.lineWidth = 1;
+  
+  ctx.beginPath();
+  ctx.roundRect(x + 4, y + 6, windowSize, windowSize, 1);
+  ctx.fill();
+  ctx.stroke();
+  
+  // Blue window glass
+  ctx.fillStyle = '#4A90E2'; // Clean blue glass
+  ctx.beginPath();
+  ctx.roundRect(x + 5, y + 7, windowSize - 2, windowSize - 2, 1);
+  ctx.fill();
+  
+  // Window cross (simple white lines)
+  ctx.strokeStyle = '#FFFFFF';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(x + 8, y + 7);
+  ctx.lineTo(x + 8, y + 13);
+  ctx.moveTo(x + 5, y + 10);
+  ctx.lineTo(x + 11, y + 10);
+  ctx.stroke();
+  
+  // === SUBTLE DETAILS (minimal, clean) ===
+  
+  // Wall highlight (where light hits the cottage)
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+  ctx.beginPath();
+  ctx.roundRect(x - cottageWidth/2, y, cottageWidth/3, cottageHeight, cornerRadius);
+  ctx.fill();
+  
+  // Small decorative elements (very subtle)
+  // Tiny shamrock near door (optional Irish touch)
+  ctx.fillStyle = '#32CD32';
+  ctx.globalAlpha = 0.6;
+  ctx.beginPath();
+  ctx.arc(x - 8, y + cottageHeight - 2, 1.5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.globalAlpha = 1.0;
 };
 
 const drawCelticBanner = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
