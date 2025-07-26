@@ -1153,17 +1153,27 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       
       {/* Tower Upgrade Popup */}
       {gameState.selectedTower && canvasRect && (
-        <TowerUpgradePopup
-          tower={gameState.selectedTower}
-          gold={gameState.gold}
-          onUpgrade={onUpgradeTower}
-          onSell={onSellTower}
-          onClose={() => onTowerSelect(undefined)}
-          position={{
-            x: canvasRect.left + gameState.selectedTower.position.x,
-            y: canvasRect.top + gameState.selectedTower.position.y
-          }}
-        />
+        <>
+          {console.log('🏗️ GameBoard - Rendering TowerUpgradePopup for tower:', gameState.selectedTower.type, 'canvasRect:', canvasRect)}
+          <TowerUpgradePopup
+            tower={gameState.selectedTower}
+            gold={gameState.gold}
+            onUpgrade={onUpgradeTower}
+            onSell={onSellTower}
+            onClose={() => onTowerSelect(undefined)}
+            position={{
+              x: canvasRect.left + gameState.selectedTower.position.x,
+              y: canvasRect.top + gameState.selectedTower.position.y
+            }}
+          />
+        </>
+      )}
+      
+      {/* Debug info when tower is selected but no canvasRect */}
+      {gameState.selectedTower && !canvasRect && (
+        <>
+          {console.log('🏗️ GameBoard - Tower selected but no canvasRect available:', gameState.selectedTower.type)}
+        </>
       )}
       
       {/* Special Attacks */}

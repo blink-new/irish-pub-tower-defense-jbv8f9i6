@@ -33,14 +33,14 @@ export const GameUI: React.FC<GameUIProps> = ({
         <CardContent>
           <Button
             onClick={() => {
-              if (!gameState.isPlaying && gameState.lives > 0 && gameState.wave <= 6) {
+              if (!gameState.isPlaying && gameState.lives > 0 && gameState.wave <= 10) {
                 soundManager.playSound('button_click');
                 onStartWave();
               }
             }}
-            disabled={gameState.isPlaying || gameState.lives <= 0 || gameState.wave > 6}
+            disabled={gameState.isPlaying || gameState.lives <= 0 || gameState.wave > 10}
             className={`w-full font-bold py-3 px-4 rounded-lg shadow-lg transition-all duration-200 border-2 ${
-              !gameState.isPlaying && gameState.lives > 0 && gameState.wave <= 6
+              !gameState.isPlaying && gameState.lives > 0 && gameState.wave <= 10
                 ? 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white border-green-400 transform hover:scale-105'
                 : 'bg-gray-400 text-gray-600 border-gray-300 cursor-not-allowed opacity-50'
             }`}

@@ -30,8 +30,25 @@ export const TowerUpgradePopup: React.FC<TowerUpgradePopupProps> = ({
   // Position popup near the tower but ensure it stays on screen
   const popupWidth = 280;
   const popupHeight = 320;
-  const adjustedX = Math.min(Math.max(position.x + 50, 10), window.innerWidth - popupWidth - 10);
-  const adjustedY = Math.min(Math.max(position.y - 50, 10), window.innerHeight - popupHeight - 10);
+  
+  // Calculate position relative to the tower, but ensure it's always visible
+  let adjustedX = position.x + 50; // Default to right of tower
+  let adjustedY = position.y - 50; // Default to above tower
+  
+  // Ensure popup stays within viewport bounds
+  if (adjustedX + popupWidth > window.innerWidth) {
+    adjustedX = position.x - popupWidth - 50; // Move to left of tower
+  }
+  if (adjustedX < 10) {
+    adjustedX = 10; // Minimum left margin
+  }
+  
+  if (adjustedY < 10) {
+    adjustedY = position.y + 50; // Move below tower if too high
+  }
+  if (adjustedY + popupHeight > window.innerHeight) {
+    adjustedY = window.innerHeight - popupHeight - 10; // Maximum bottom margin
+  }
 
   // Get tower quotes
   const getQuote = () => {
@@ -49,9 +66,12 @@ export const TowerUpgradePopup: React.FC<TowerUpgradePopupProps> = ({
     }
   };
 
+  // Debug logging
+  console.log('🏗️ TowerUpgradePopup rendering for tower:', tower.type, 'at position:', { adjustedX, adjustedY });
+
   return (
     <div
-      className="fixed z-50 pointer-events-auto"
+      className="fixed z-[9999] pointer-events-auto"
       style={{
         left: adjustedX,
         top: adjustedY,
