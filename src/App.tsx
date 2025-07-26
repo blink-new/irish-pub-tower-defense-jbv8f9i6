@@ -49,7 +49,7 @@ function App() {
       <AuthWrapper>
         <div className="min-h-screen bg-background text-foreground">
         {/* Header */}
-        <header className="bg-primary border-b-2 border-accent p-4">
+        <header className="bg-primary border-b-2 border-accent p-4 mobile-header">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-center gap-4">
               <img 
@@ -81,9 +81,9 @@ function App() {
         </header>
 
         {/* Main Game Area */}
-        <main className="flex max-w-7xl mx-auto">
+        <main className="flex max-w-7xl mx-auto mobile-main">
           {/* Game Board */}
-          <div className="flex-1 p-6">
+          <div className="flex-1 p-6 mobile-game-board">
             <div className="bg-card rounded-lg p-4 border-2 border-accent">
               <GameBoard
                 gameState={gameState}
@@ -106,7 +106,7 @@ function App() {
             </div>
             
             {/* Instructions */}
-            <div className="mt-4 bg-card rounded-lg p-4 border border-muted">
+            <div className="mt-4 bg-card rounded-lg p-4 border border-muted mobile-instructions">
               <h3 className="font-celtic text-lg text-accent mb-2">How to Play:</h3>
               <ul className="text-sm text-muted-foreground space-y-1">
                 <li key="instruction-1">• Select a defender from the shop and click on a high stool to place them</li>
@@ -129,7 +129,7 @@ function App() {
         </main>
 
         {/* Footer */}
-        <footer className="bg-primary border-t-2 border-accent p-4 mt-8">
+        <footer className="bg-primary border-t-2 border-accent p-4 mt-8 mobile-footer">
           <div className="max-w-7xl mx-auto text-center">
             <div className="flex items-center justify-center gap-3 mb-2">
               <img 

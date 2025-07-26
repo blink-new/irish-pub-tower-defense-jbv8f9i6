@@ -40,7 +40,17 @@ export const SpecialAttacks: React.FC<SpecialAttacksProps> = ({
     e.preventDefault();
   };
 
-  // Use useEffect to handle global mouse events when dragging
+  const handleTouchStart = (e: React.TouchEvent, attackId: string) => {
+    const attack = specialAttacks.find(a => a.id === attackId);
+    if (!attack || attack.currentCooldown > 0 || !isWaveActive) return;
+
+    const touch = e.touches[0];
+    setDragging(attackId);
+    setDragPosition({ x: touch.clientX, y: touch.clientY });
+    e.preventDefault();
+  };
+
+  // Use useEffect to handle global mouse and touch events when dragging
   useEffect(() => {
     if (!dragging) return;
 
@@ -48,15 +58,21 @@ export const SpecialAttacks: React.FC<SpecialAttacksProps> = ({
       setDragPosition({ x: e.clientX, y: e.clientY });
     };
 
-    const handleMouseUp = (e: MouseEvent) => {
+    const handleTouchMove = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      setDragPosition({ x: touch.clientX, y: touch.clientY });
+      e.preventDefault(); // Prevent scrolling while dragging
+    };
+
+    const handleEnd = (clientX: number, clientY: number) => {
       // Get fresh canvas rect to ensure accuracy
       const canvas = document.querySelector('canvas');
       const rect = canvas?.getBoundingClientRect() || canvasRect;
       
       if (rect) {
-        const canvasX = Math.max(0, Math.min(900, e.clientX - rect.left)); // Clamp to canvas bounds
-        const canvasY = Math.max(0, Math.min(600, e.clientY - rect.top));
-        console.log(`🎯 SPECIAL ATTACK DEBUG - Mouse position: (${e.clientX}, ${e.clientY})`);
+        const canvasX = Math.max(0, Math.min(900, clientX - rect.left)); // Clamp to canvas bounds
+        const canvasY = Math.max(0, Math.min(600, clientY - rect.top));
+        console.log(`🎯 SPECIAL ATTACK DEBUG - Position: (${clientX}, ${clientY})`);
         console.log(`🎯 SPECIAL ATTACK DEBUG - Canvas rect: left=${rect.left}, top=${rect.top}, width=${rect.width}, height=${rect.height}`);
         console.log(`🎯 SPECIAL ATTACK DEBUG - Calculated canvas coordinates: (${canvasX}, ${canvasY})`);
         console.log(`🎯 SPECIAL ATTACK DEBUG - Calling onUseSpecialAttack with position: (${canvasX}, ${canvasY})`);
@@ -68,14 +84,28 @@ export const SpecialAttacks: React.FC<SpecialAttacksProps> = ({
       setDragging(null);
     };
 
-    // Attach global event listeners
+    const handleMouseUp = (e: MouseEvent) => {
+      handleEnd(e.clientX, e.clientY);
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      const touch = e.changedTouches[0];
+      handleEnd(touch.clientX, touch.clientY);
+      e.preventDefault();
+    };
+
+    // Attach global event listeners for both mouse and touch
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleTouchEnd, { passive: false });
 
     // Cleanup on unmount or when dragging stops
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
     };
   }, [dragging, canvasRect, onUseSpecialAttack]);
 
@@ -99,6 +129,7 @@ export const SpecialAttacks: React.FC<SpecialAttacksProps> = ({
                   : 'opacity-50 cursor-not-allowed'
               }`}
               onMouseDown={(e) => handleMouseDown(e, attack.id)}
+              onTouchStart={(e) => handleTouchStart(e, attack.id)}
 
             >
               <span className="text-2xl">{attack.icon}</span>

@@ -86,3 +86,69 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Mobile Landscape Optimizations */
+@media screen and (height <= 600px) and (orientation: landscape) {
+  /* Reduce header padding on mobile landscape */
+  .mobile-header {
+    @apply p-2;
+  }
+  
+  .mobile-header h1 {
+    @apply text-2xl;
+  }
+  
+  .mobile-header p {
+    @apply text-sm mt-1;
+  }
+  
+  .mobile-header img {
+    @apply w-10 h-10;
+  }
+  
+  /* Compact main layout for mobile landscape */
+  .mobile-main {
+    @apply flex-col lg:flex-row;
+  }
+  
+  /* Compact sidebar for mobile landscape */
+  .mobile-sidebar {
+    @apply w-full lg:w-80 max-h-[50vh] lg:max-h-none overflow-y-auto;
+  }
+  
+  /* Reduce game board padding */
+  .mobile-game-board {
+    @apply p-2;
+  }
+  
+  /* Hide footer on mobile landscape to save space */
+  .mobile-footer {
+    @apply hidden;
+  }
+  
+  /* Make instructions more compact */
+  .mobile-instructions {
+    @apply mt-2 p-2;
+  }
+  
+  .mobile-instructions h3 {
+    @apply text-base mb-1;
+  }
+  
+  .mobile-instructions ul {
+    @apply text-xs space-y-0.5;
+  }
+}
+
+/* Touch-friendly enhancements */
+@media (hover: none) and (pointer: coarse) {
+  /* Larger touch targets for mobile */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  /* Disable hover effects on touch devices */
+  .no-touch-hover:hover {
+    @apply transform-none bg-transparent;
+  }
+}

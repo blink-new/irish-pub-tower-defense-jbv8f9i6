@@ -22,7 +22,7 @@ export const GameUI: React.FC<GameUIProps> = ({
   onStartWave
 }) => {
   return (
-    <div className="w-80 bg-card border-l-2 border-accent p-4 space-y-4">
+    <div className="w-80 bg-card border-l-2 border-accent p-4 space-y-4 mobile-sidebar">
 
 
       {/* Wave Control */}
