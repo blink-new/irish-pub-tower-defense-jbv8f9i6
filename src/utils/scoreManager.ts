@@ -17,6 +17,12 @@ export const saveGameScore = async (scoreData: ScoreData): Promise<boolean> => {
       return false;
     }
 
+    console.log('🎮 Current user for score saving:', {
+      id: user.id,
+      email: user.email,
+      displayName: user.displayName || 'N/A'
+    });
+
     // Score now represents stars earned from killing enemies
     const stars = scoreData.score;
 
@@ -30,7 +36,15 @@ export const saveGameScore = async (scoreData: ScoreData): Promise<boolean> => {
       worldId: scoreData.worldId || 'forest-pub'
     });
 
-    console.log(`✅ Score saved: ${scoreData.score} points, Wave ${scoreData.wave}, ${stars} stars`);
+    console.log(`✅ Score saved successfully:`, {
+      score: scoreData.score,
+      wave: scoreData.wave,
+      stars: stars,
+      worldId: scoreData.worldId || 'forest-pub',
+      userId: user.id,
+      userEmail: user.email
+    });
+    
     return true;
   } catch (error) {
     console.error('Error in saveGameScore:', error);
@@ -134,4 +148,37 @@ export const fetchUserBestScore = async (worldId?: string) => {
     console.error('Error in fetchUserBestScore:', error);
     return null;
   }
+};
+
+// Debug functions for testing - can be called from browser console
+(window as any).checkCurrentUser = async () => {
+  try {
+    const user = await blink.auth.me();
+    console.log('🔍 Current authenticated user:', user);
+    return user;
+  } catch (error) {
+    console.error('❌ Error checking user:', error);
+    return null;
+  }
+};
+
+(window as any).testScoreSave = async () => {
+  const testScore = {
+    score: 100,
+    wave: 5,
+    stars: 100,
+    worldId: 'irish-countryside'
+  };
+  
+  console.log('🧪 Testing score save with:', testScore);
+  const result = await saveGameScore(testScore);
+  console.log('🧪 Test result:', result);
+  return result;
+};
+
+(window as any).testFetchScores = async () => {
+  console.log('🧪 Testing fetch scores...');
+  const result = await fetchTopScores('irish-countryside', 10);
+  console.log('🧪 Fetch result:', result);
+  return result;
 };
