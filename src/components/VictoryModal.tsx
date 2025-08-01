@@ -18,7 +18,6 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
   worldId
 }) => {
   const [scoreSaved, setScoreSaved] = useState(false);
-  const [stars, setStars] = useState(0);
 
   // Save score when modal becomes visible
   useEffect(() => {
@@ -32,10 +31,6 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
         
         if (success) {
           setScoreSaved(true);
-          // Calculate stars for display (same logic as in scoreManager)
-          let calculatedStars = 3; // 3 stars for completing all waves
-          if (score >= 50000) calculatedStars = 3; // Max stars
-          setStars(calculatedStars);
         }
       };
       
@@ -81,18 +76,6 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
             <p className="text-primary-foreground text-lg">
               Paddy Losty is proud! Final Score: <span className="text-accent font-bold">{score.toLocaleString()}</span>
             </p>
-            
-            {/* Stars Display */}
-            {stars > 0 && (
-              <div className="flex justify-center items-center gap-1">
-                {Array.from({ length: stars }, (_, i) => (
-                  <span key={i} className="text-2xl animate-pulse">⭐</span>
-                ))}
-                <span className="text-primary-foreground ml-2">
-                  {stars === 3 ? 'Perfect Victory!' : stars === 2 ? 'Great Job!' : 'Well Done!'}
-                </span>
-              </div>
-            )}
             
             {scoreSaved && (
               <p className="text-sm text-primary-foreground/80">

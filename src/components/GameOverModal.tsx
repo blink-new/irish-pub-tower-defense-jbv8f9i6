@@ -22,7 +22,6 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
   worldId
 }) => {
   const [scoreSaved, setScoreSaved] = useState(false);
-  const [stars, setStars] = useState(0);
 
   // Save score when modal becomes visible
   useEffect(() => {
@@ -36,8 +35,6 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
         
         if (success) {
           setScoreSaved(true);
-          // Score now represents stars earned from killing enemies
-          setStars(score);
         }
       };
       
@@ -78,18 +75,6 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
               <p className="text-sm text-muted-foreground mb-1">Final Score</p>
               <p className="text-2xl font-bold text-accent">{score.toLocaleString()}</p>
               <p className="text-sm text-muted-foreground">Reached Wave {wave}</p>
-              
-              {/* Stars Display */}
-              {stars > 0 && (
-                <div className="flex justify-center items-center gap-1">
-                  {Array.from({ length: stars }, (_, i) => (
-                    <span key={i} className="text-lg">⭐</span>
-                  ))}
-                  <span className="text-sm text-muted-foreground ml-2">
-                    {stars === 3 ? 'Legendary!' : stars === 2 ? 'Great!' : 'Good effort!'}
-                  </span>
-                </div>
-              )}
               
               {scoreSaved && (
                 <p className="text-xs text-muted-foreground">
